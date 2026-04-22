@@ -1,0 +1,9 @@
+fastapi==0.105.0
+Flask==2.2.2
+Flask-Bootstrap==3.3.7.1
+Flask-Cors==3.0.10
+Flask-SQLAlchemy==3.0.3
+Flask-WTF==1.1.1
+SQLAlchemy==2.0.3
+uvicorn==0.24.0.post1
+python-dotenv==1.2.1

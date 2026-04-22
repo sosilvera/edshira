@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdShira - Proyecto {proyectName}</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-container">
+                    <h2 class="full-logo">EdShira</h2>
+                    <h2 class="mini-logo">ES</h2>
+                </div>
+                <span class="collapse-icon" id="toggle-sidebar">❮</span>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-btn" title="Backlog">
+                    <span class="nav-icon">📚</span>
+                    <span class="nav-text">Backlog</span>
+                </button>
+                <button class="nav-btn" title="Test Plan">
+                    <span class="nav-icon">🛠️</span>
+                    <span class="nav-text">Test Plan</span>
+                </button>
+                <button class="nav-btn" title="Test Lab">
+                    <span class="nav-icon">🔬</span>
+                    <span class="nav-text">Test Lab</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="nav-btn" title="Configuración">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Configuración</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="global-navbar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Buscar tareas, HU o bugs..." class="search-input">
+                </div>
+                
+                <div class="navbar-actions">
+                    <button class="btn-create">+ Crear historia</button>
+                    <div class="user-profile">
+                        <div class="user-avatar">S</div>
+                        <span class="user-name">Seba</span>
+                    </div>
+                </div>
+            </header>
+
+            <header class="top-header">
+                <h1>Proyecto {proyectName}</h1>
+            </header>
+
+            <section class="sprint-header">
+                <h2>Sprint {nroSprint}</h2>
+                <button class="btn-primary">Finalizar sprint</button>
+            </section>
+
+            <div class="kanban-board">
+                <div class="kanban-column" data-status="todo">
+                    <div class="column-header">
+                        <h3>To Do</h3>
+                    </div>
+                    <div class="kanban-cards">
+                        <div class="card bug-card" draggable="true" id="task-1">
+                            <div class="card-content">
+                                <h4 class="task-title">Error al iniciar</h4>
+                                <p class="task-desc">La aplicación crashea al hacer login con un usuario recién registrado.</p>
+                            </div>
+                            <div class="card-footer">
+                                <span class="task-code">BUG-402</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card story-card" draggable="true" id="task-2">
+                            <div class="card-content">
+                                <h4 class="task-title">Armar API</h4>
+                                <p class="task-desc">Desarrollar los endpoints principales para la gestión de usuarios.</p>
+                            </div>
+                            <div class="card-footer">
+                                <span class="task-code">US-105</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="kanban-column" data-status="inprogress">
+                    <div class="column-header">
+                        <h3>En Progreso</h3>
+                    </div>
+                    <div class="kanban-cards"></div>
+                </div>
+
+                <div class="kanban-column" data-status="testing">
+                    <div class="column-header">
+                        <h3>Testing</h3>
+                    </div>
+                    <div class="kanban-cards">
+                        <div class="card bug-card" draggable="true" id="task-3">
+                            <div class="card-content">
+                                <h4 class="task-title">Error al cargar</h4>
+                                <p class="task-desc">El dashboard queda en blanco si la base de datos demora en responder.</p>
+                            </div>
+                            <div class="card-footer">
+                                <span class="task-code">BUG-388</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="kanban-column" data-status="done">
+                    <div class="column-header">
+                        <h3>Done</h3>
+                    </div>
+                    <div class="kanban-cards"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="js/app.js"></script>
+</body>
+</html>
