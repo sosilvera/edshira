@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from models.models import (Table)
 from commons.querys import Querys
 
-router = APIRouter(prefix="/edshira")
+router = APIRouter(prefix="/edshira/api/projects")
 q = Querys()
 
 
