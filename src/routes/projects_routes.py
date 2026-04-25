@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from commons.querys import Querys
 from schema.database import get_db
-from models.models import CreateSprintRequest, CreateTaskRequest
+from models.models import CreateSprintRequest, CreateTaskRequest, UpdateEstadoRequest, AssignResponsibleRequest
 
 router = APIRouter(prefix="/edshira/api/projects")
 
@@ -43,7 +43,7 @@ async def crear_tarea(payload: CreateTaskRequest, db: Session = Depends(get_db))
             raise HTTPException(status_code=404, detail="Sprint no encontrado")
         if sprint.idProyecto != payload.idProyecto: # Compara el idProyecto del sprint con el idProyecto de la tarea
             raise HTTPException(status_code=400, detail="El idProyecto debe ser el mismo que el del sprint")
-
+            
     result = q.createTarea(payload)
 
     return result
@@ -56,12 +56,21 @@ async def get_tarea(idTarea: int, db: Session = Depends(get_db)):
     if not tarea:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
 
-    return {
-        "idTarea": tarea.idTarea,
-        "codigo": tarea.codigo,
-        "tipoTarea": tarea.tipoTarea,
-        "titulo": tarea.titulo,
-        "descripcion": tarea.descripcion,
-        "estado": tarea.estado,
-    }
+    return tarea
+
+
+@router.post("/actualizar_estado")
+async def actualizar_estado(payload: UpdateEstadoRequest, db: Session = Depends(get_db)):
+    q = Querys(db)
+    result = q.updateEstado(payload.idTarea, payload.idEstado)
+
+    return result
+
+
+@router.post("/asignar_responsable")
+async def asignar_responsable(payload: AssignResponsibleRequest, db: Session = Depends(get_db)):
+    q = Querys(db)
+    result = q.assignResponsable(payload.idTarea, payload.idResponsable)
+
+    return result
 

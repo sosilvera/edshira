@@ -71,18 +71,27 @@ class Tarea(Base):
     __tablename__ = 'Tareas'
     
     idTarea = Column(Integer, primary_key=True, autoincrement=True)
+    # Nueva columna vinculada directamente al Proyecto
+    idProyecto = Column(Integer, ForeignKey('Proyecto.idProyecto', ondelete='CASCADE'), nullable=False)
+    
     Codigo = Column(String(50), unique=True, nullable=True) 
     Titulo = Column(String(255), nullable=False)
     Descripcion = Column(Text, nullable=True)
     file = Column(String(255), nullable=True)
     
-    # Claves Foráneas
+    UsuarioCreador = Column(Integer, ForeignKey('Usuarios.idUsuario', ondelete='SET NULL'), nullable=True)
     idResponsable = Column(Integer, ForeignKey('Usuarios.idUsuario', ondelete='SET NULL'), nullable=True)
     idTipo = Column(Integer, ForeignKey('Tipo_Tarea.idTipo', ondelete='SET NULL'), nullable=True)
-    idSprint = Column(Integer, ForeignKey('Proyecto_Sprint.idProySprint', ondelete='CASCADE'), nullable=True)
-    
-    # NUEVA Clave Foránea apuntando al Estado
     idEstadoTarea = Column(Integer, ForeignKey('Estado_Tarea.idEstado', ondelete='SET NULL'), nullable=True)
+    
+    # El idSprint ahora puede ser opcional (Backlog)
+    idSprint = Column(Integer, ForeignKey('Proyecto_Sprint.idProySprint', ondelete='CASCADE'), nullable=True)
+
+    # Relaciones para navegación fácil
+    proyecto = relationship("Proyecto")
+    sprint = relationship("ProyectoSprint")
+    creador = relationship("Usuario", foreign_keys=[UsuarioCreador])
+    asignado = relationship("Usuario", foreign_keys=[idResponsable])
     
 class Test(Base):
     __tablename__ = 'Tests'

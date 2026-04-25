@@ -17,8 +17,6 @@ class Querys():
 
         self.session = db
 
-
-
     def getSprintActivo(self, idProject: int):
         try:
             sprint = self.session.query(ProyectoSprint).filter(ProyectoSprint.idProyecto == idProject, ProyectoSprint.Abierto == True).first()
@@ -67,35 +65,125 @@ class Querys():
 
     def getSprintById(self, idSprint: int):
         try:
-            result = self.session.query(ProyectoSprint).filter(ProyectoSprint.idSprint == idSprint).first()
+            result = self.session.query(ProyectoSprint).filter(ProyectoSprint.idProySprint == idSprint).first()
         
             return result
         except Exception as e:
+            print(f"Error al obtener el sprint por ID: {str(e)}")
             return None
+
+    def countTareasProyecto(self, idProyecto: int):
+        print("IdProyecto:", idProyecto)
+        
+        counter = self.session.query(func.count(Tarea.idTarea)).\
+            join(ProyectoSprint, ProyectoSprint.idProySprint == Tarea.idSprint, isouter=True).\
+            join(Proyecto, Proyecto.idProyecto == ProyectoSprint.idProyecto).\
+            filter(Proyecto.idProyecto == idProyecto).group_by(Proyecto.idProyecto).scalar()
+        
+        print("Counter:", counter)
+        return counter
 
     def createTarea(self, payload):
         try:
             # Obtener el código del proyecto
             project_code = self.session.query(Proyecto.Codigo).filter(Proyecto.idProyecto == payload.idProyecto).scalar()
-            
+
             # Contar las tareas en los sprints del proyecto
-            count_tareas = self.session.query(func.count(Tarea.idTarea)).join(Proyecto, Proyecto.idProyecto == ProyectoSprint.idProyecto).join(ProyectoSprint, ProyectoSprint.idSprint == Tarea.idSprint, isouter=True).filter(Proyecto.idProyecto == payload.idProyecto).group_by(Proyecto.idProyecto).scalar()
-            
+            count_tareas = self.countTareasProyecto(payload.idProyecto)
+
+            print("Cantidad de tareas en el proyecto:", count_tareas)
+
             # Generar el código
             codigo = f"{project_code}-{count_tareas + 1}"
+            print("Código generado:", codigo)
             
             nueva_tarea = Tarea(
                 Titulo=payload.titulo,
                 Descripcion=payload.descripcion,
+                idTipo=payload.idTipo,
+                idEstadoTarea=1,
                 idSprint=payload.idSprint,
-                idUsuario=payload.idUsuario,
+                UsuarioCreador=payload.idUsuario,
                 idProyecto=payload.idProyecto,
                 Codigo=codigo
             )
             self.session.add(nueva_tarea)
             self.session.commit()
 
-            return {"value": "Tarea creada exitosamente"}
+            return {"value": f"Tarea creada: {nueva_tarea.Codigo}"}
         except Exception as e:
             self.session.rollback()
-            return {"value": f"Error al crear la tarea: {str(e)}"}
+            print(f"Error al crear la tarea: {str(e)}")
+            return {"value": None}
+
+    def getTarea(self, idTarea: int):
+        try:
+            creador = aliased(Usuario)
+            responsable = aliased(Usuario)
+            result = self.session.query(
+                Tarea.idTarea,
+                Tarea.Codigo,
+                TipoTarea.Nombre.label('Tipo'),
+                EstadoTarea.Nombre.label('Estado'),
+                Tarea.Titulo,
+                Tarea.Descripcion,
+                ProyectoSprint.NroSprint,
+                Proyecto.Nombre.label('nombre_proyecto'),
+                creador.Nombre.label('creador'),
+                responsable.Nombre.label('responsable')
+            ).join(TipoTarea, TipoTarea.idTipo == Tarea.idTipo)\
+            .join(EstadoTarea, EstadoTarea.idEstado == Tarea.idEstadoTarea)\
+            .join(Proyecto, Proyecto.idProyecto == Tarea.idProyecto)\
+            .join(creador, creador.idUsuario == Tarea.UsuarioCreador)\
+            .outerjoin(ProyectoSprint, ProyectoSprint.idProySprint == Tarea.idSprint)\
+            .outerjoin(responsable, responsable.idUsuario == Tarea.idResponsable)\
+            .filter(Tarea.idTarea == idTarea).first()
+            if result:
+                return {
+                    "idTarea": result[0],
+                    "codigo": result[1],
+                    "tipo": result[2],
+                    "estado": result[3],
+                    "titulo": result[4],
+                    "descripcion": result[5],
+                    "nroSprint": result[6],
+                    "nombre_proyecto": result[7],
+                    "creador": result[8],
+                    "responsable": result[9]
+                }
+            else:
+                return None
+        except Exception as e:
+            print(f"Error al obtener la tarea: {str(e)}")
+            return None
+
+    def updateEstado(self, idTarea: int, idEstado: int):
+        try:
+            tarea = self.session.query(Tarea).filter(Tarea.idTarea == idTarea).first()
+            if not tarea:
+                return {"value": "Tarea no encontrada"}
+
+            tarea.idEstadoTarea = idEstado
+            self.session.commit()
+
+            return {"value": "Estado actualizado exitosamente"}
+        except Exception as e:
+            self.session.rollback()
+            print(f"Error al actualizar el estado: {str(e)}")
+            return {"value": "Error al actualizar el estado"}
+
+
+    def assignResponsable(self, idTarea: int, idResponsable: int):
+        try:
+            tarea = self.session.query(Tarea).filter(Tarea.idTarea == idTarea).first()
+            if not tarea:
+                return {"value": "Tarea no encontrada"}
+
+            tarea.idResponsable = idResponsable
+            self.session.commit()
+
+            return {"value": "Responsable asignado exitosamente"}
+        except Exception as e:
+            self.session.rollback()
+            print(f"Error al asignar el responsable: {str(e)}")
+            return {"value": "Error al asignar el responsable"}
