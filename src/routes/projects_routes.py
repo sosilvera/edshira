@@ -1,31 +1,67 @@
-from fastapi import APIRouter, HTTPException
-from models.models import (Table)
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
 from commons.querys import Querys
+from schema.database import get_db
+from models.models import CreateSprintRequest, CreateTaskRequest
 
 router = APIRouter(prefix="/edshira/api/projects")
-q = Querys()
 
 
-# Obtiene una SIM dado un sistema, y la pasa a Lockeado
-@router.get("/get/")
-async def get_func():
-    result = q.get()
+@router.get("/sprintActivo/{idProject}")
+async def get_sprint_activo(db: Session = Depends(get_db), idProject: int = None):
+    q = Querys(db)
+    result = q.getSprintActivo(idProject)
 
     return result
 
-@router.post("/insert")
-async def insert_func(value: ValueObject):
-    result = q.insert(value.id, value.value)
+
+@router.post("/crear_sprint")
+async def crear_sprint(payload: CreateSprintRequest, db: Session = Depends(get_db)):
+    q = Querys(db)
+    activo = q.getSprintActivo(payload.idProyecto)
+    if activo:
+        raise HTTPException(status_code=400, detail="Ya existe un sprint activo en este proyecto")
+
+    result = q.createSprint(
+        idProyecto=payload.idProyecto,
+        fechaInicio=payload.fechaInicio,
+        fechaCierre=payload.fechaCierre,
+        tareas=payload.tareas,
+        objetivo=payload.objetivo
+    )
+
     return result
 
-@router.post("/update")
-async def change_sim(v: ValueObject):
-    id = q.update(v.id, v.value)
 
-    return id
+@router.post("/crear_tarea")
+async def crear_tarea(payload: CreateTaskRequest, db: Session = Depends(get_db)):
+    q = Querys(db)
+    if payload.idSprint:
+        # Devuelve todo el sprint
+        sprint = q.getSprintById(payload.idSprint)
+        if not sprint:
+            raise HTTPException(status_code=404, detail="Sprint no encontrado")
+        if sprint.idProyecto != payload.idProyecto: # Compara el idProyecto del sprint con el idProyecto de la tarea
+            raise HTTPException(status_code=400, detail="El idProyecto debe ser el mismo que el del sprint")
 
-@router.post("/delete")
-async def delete_func(value: ValueObject):
-    result = q.delete(value.value)
+    result = q.createTarea(payload)
+
     return result
+
+
+@router.get("/get_tarea/{idTarea}")
+async def get_tarea(idTarea: int, db: Session = Depends(get_db)):
+    q = Querys(db)
+    tarea = q.getTarea(idTarea)
+    if not tarea:
+        raise HTTPException(status_code=404, detail="Tarea no encontrada")
+
+    return {
+        "idTarea": tarea.idTarea,
+        "codigo": tarea.codigo,
+        "tipoTarea": tarea.tipoTarea,
+        "titulo": tarea.titulo,
+        "descripcion": tarea.descripcion,
+        "estado": tarea.estado,
+    }
 
