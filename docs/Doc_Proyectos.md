@@ -6,7 +6,7 @@
     - Listar sprints pasados
     - Gestionar backlog
 - Tareas
-    - Crear tarea
+    - Crear tarea [LISTO]
         - Tipos de tarea: Epica, Historia de Usuario, Defecto
         - Resumen
         - Creador
@@ -30,7 +30,7 @@ Crear sprint sera una pantalla en donde se pueda:
 - Asignar objetivo
 
 #### APIs
-GET /sprint_activo:  [EN_PROCESO]
+GET /sprint_activo:  [LISTO]
     - Trae el idSprint que se encuentra activo, la fecha de cierre y una lista de tareas, junto con su estado
     - Esta API se usara para cargar la pantalla principal de la pagina, y asi poder ubicar las tareas en su correspondiente columna
 
@@ -65,7 +65,7 @@ Las tareas pueden estar en backlog del proyecto, por lo que idSprint es opcional
 A las tareas se le pueden asignar responsables
 
 #### APIs
-POST /crear_tarea [EN_PROCESO]
+POST /crear_tarea [LISTO]
     Se va a mandar:
         - Titulo
         - Descripcion
@@ -73,7 +73,7 @@ POST /crear_tarea [EN_PROCESO]
         - idUsuario
         - idProyecto -> Tiene que ser el mismo que el del sprint. Se agrega por si idSprint viene vacio (va al backlog)
 
-GET /get_tarea/{idTarea} [EN_PROCESO]
+GET /get_tarea/{idTarea} [LISTO]
     Devuelve:
         - idTarea
         - Codigo
@@ -83,5 +83,6 @@ GET /get_tarea/{idTarea} [EN_PROCESO]
         - Estado
         
 POST /modificar_tarea/{idTarea}
-POST /asignar_responsable
-POST /actualizar_estado
+POST /asignar_responsable [LISTO]
+POST /actualizar_estado [LISTO]
+    - Viene idEstado e idTarea en el body, lo actualiza en la tabla
