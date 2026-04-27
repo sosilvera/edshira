@@ -1,5 +1,10 @@
 ### Gestion de proyecto
 
+- Proyecto
+    - Traer proyectos de un usuario: /proyectosUsuario/{idUsuario}
+    - Asignar usuario a un proyecto: /asignar_proyecto
+    - Listar proyectos: /get_proyectos
+    - Crear proyecto: /crear_proyecto
 - Sprint
     - Crear sprint
     - Cerrar sprint
@@ -86,3 +91,25 @@ POST /modificar_tarea/{idTarea}
 POST /asignar_responsable [LISTO]
 POST /actualizar_estado [LISTO]
     - Viene idEstado e idTarea en el body, lo actualiza en la tabla
+
+### Flujo Web
+Cuando carga la página:
+
+- Revisar en CACHE si hay un usuario logueado
+	- Si NO hay usuario:
+		- Mostrar modal para que ingrese usuario
+		- Guardarlo en cache
+		- Llamar a la API /proyectosUsuario/{idUsuario}, el cual devuelve un array de idProyectos
+			- Elegir el primer elemento del array
+			- Guardarlo en cache
+		- Recargar pagina
+
+- Validar si el usuario tiene un proyecto asignado: revisar si tiene un idProyecto en la cache, 
+	- Si no tiene:
+		- Llamar a la API /proyectosUsuario/{idUsuario}, el cual devuelve un array de idProyectos
+		- Elegir el primer elemento del array
+		- Guardarlo en cache
+	- Si /proyectoUsuario devuelve vacio, debe mostrar un listado de proyectos a suscribir, mediante el llamado a /get_proyectos
+		- Con el idProyecto, llamar la api POST /asignar_proyecto con el idUsuario e idProyecto
+
+- Llamar API /sprintActivo/{idProject} con el idProject que tiene el usuario en la cache
