@@ -1,4 +1,4 @@
-from schema.models import (Base, Usuario, TipoTarea, EstadoTarea, Proyecto, ProyectoSprint, TestPlan, TestCycle, Tarea, Test, TestExecution, DefectoTest)
+from schema.models import (Base, Usuario, TipoTarea, EstadoTarea, Proyecto, ProyectoSprint, TestPlan, TestCycle, Tarea, Test, TestExecution, DefectoTest, UsuarioProyecto)
 from sqlalchemy import create_engine, func, and_, or_, update
 from sqlalchemy.orm import sessionmaker, aliased
 from datetime import datetime
@@ -16,6 +16,54 @@ class Querys():
         #self.session = Session()
 
         self.session = db
+
+    def getProyectosUsuario(self, idUsuario: int):
+        try:
+            proyectos = self.session.query(Proyecto.idProyecto, Proyecto.Nombre).join(UsuarioProyecto, UsuarioProyecto.idProyecto == Proyecto.idProyecto).filter(UsuarioProyecto.idUsuario == idUsuario).all()
+            return [{"idProyecto": p[0], "nombre": p[1]} for p in proyectos]
+        except Exception as e:
+            print(f"Error al obtener los proyectos del usuario: {str(e)}")
+            return []
+
+    def getProyectos(self):
+        try:
+            proyectos = self.session.query(Proyecto.idProyecto, Proyecto.Nombre).all()
+            return [{"idProyecto": p[0], "nombre": p[1]} for p in proyectos]
+        except Exception as e:
+            print(f"Error al obtener los proyectos: {str(e)}")
+            return []
+
+    def assignProject(self, idUsuario: int, idProyecto: int):
+        try:
+            # Verificar si el proyecto existe
+            proyecto = self.session.query(Proyecto).filter(Proyecto.idProyecto == idProyecto).first()
+            if not proyecto:
+                return {"value": "Proyecto no encontrado"}
+
+            # Verificar si el usuario existe
+            usuario = self.session.query(Usuario).filter(Usuario.idUsuario == idUsuario).first()
+            if not usuario:
+                return {"value": "Usuario no encontrado"}
+
+            # Verificar si la asignación ya existe
+            asignacion_existente = self.session.query(UsuarioProyecto).filter(
+                UsuarioProyecto.idUsuario == idUsuario,
+                UsuarioProyecto.idProyecto == idProyecto
+            ).first()
+
+            if asignacion_existente:
+                return {"value": "El usuario ya está asignado a este proyecto"}
+
+            # Crear la nueva asignación
+            nueva_asignacion = UsuarioProyecto(idUsuario=idUsuario, idProyecto=idProyecto)
+            self.session.add(nueva_asignacion)
+            self.session.commit()
+
+            return {"value": "Usuario asignado al proyecto exitosamente"}
+        except Exception as e:
+            self.session.rollback()
+            print(f"Error al asignar el proyecto: {str(e)}")
+            return {"value": "Error al asignar el proyecto"}
 
     def getSprintActivo(self, idProject: int):
         try:
@@ -171,7 +219,6 @@ class Querys():
             self.session.rollback()
             print(f"Error al actualizar el estado: {str(e)}")
             return {"value": "Error al actualizar el estado"}
-
 
     def assignResponsable(self, idTarea: int, idResponsable: int):
         try:

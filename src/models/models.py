@@ -27,3 +27,7 @@ class UpdateEstadoRequest(BaseModel):
 class AssignResponsibleRequest(BaseModel):
     idTarea: int
     idResponsable: int
+
+class AssignProjectRequest(BaseModel):
+    idUsuario: int
+    idProyecto: int

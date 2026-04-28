@@ -36,6 +36,16 @@ class Proyecto(Base):
     # Ejemplo de relationship: te permite acceder al objeto Usuario desde el Proyecto
     responsable = relationship("Usuario")
 
+class UsuarioProyecto(Base):
+    __tablename__ = 'Usuario_Proyecto'
+    
+    idUsuarioProyecto = Column(Integer, primary_key=True, autoincrement=True)
+    idUsuario = Column(Integer, ForeignKey('Usuarios.idUsuario', ondelete='CASCADE'), nullable=False)
+    idProyecto = Column(Integer, ForeignKey('Proyecto.idProyecto', ondelete='CASCADE'), nullable=False)
+    
+    # Relaciones para navegación fácil
+    usuario = relationship("Usuario")
+    proyecto = relationship("Proyecto")
 
 # 3. Tablas de Nivel 2 (Dependen de Proyecto y Usuarios)
 class ProyectoSprint(Base):

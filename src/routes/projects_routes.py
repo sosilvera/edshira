@@ -2,10 +2,30 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from commons.querys import Querys
 from schema.database import get_db
-from models.models import CreateSprintRequest, CreateTaskRequest, UpdateEstadoRequest, AssignResponsibleRequest
+from models.models import CreateSprintRequest, CreateTaskRequest, UpdateEstadoRequest, AssignResponsibleRequest, AssignProjectRequest
 
 router = APIRouter(prefix="/edshira/api/projects")
 
+@router.get("/proyectos_usuario/{idUsuario}")
+async def get_proyectos_usuario(idUsuario: int, db: Session = Depends(get_db)):
+    q = Querys(db)
+    result = q.getProyectosUsuario(idUsuario)
+
+    return result
+
+@router.get("/get_proyectos")
+async def get_proyectos(db: Session = Depends(get_db)):
+    q = Querys(db)
+    result = q.getProyectos()
+
+    return result
+
+@router.post("/asignar_proyecto")
+async def asignar_proyecto(payload: AssignProjectRequest, db: Session = Depends(get_db)):
+    q = Querys(db)
+    result = q.assignProject(payload.idUsuario, payload.idProyecto)
+
+    return result
 
 @router.get("/sprintActivo/{idProject}")
 async def get_sprint_activo(db: Session = Depends(get_db), idProject: int = None):
@@ -31,7 +51,6 @@ async def crear_sprint(payload: CreateSprintRequest, db: Session = Depends(get_d
     )
 
     return result
-
 
 @router.post("/crear_tarea")
 async def crear_tarea(payload: CreateTaskRequest, db: Session = Depends(get_db)):
