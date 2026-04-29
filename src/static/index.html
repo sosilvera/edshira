@@ -3,12 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EdShira - Proyecto {proyectName}</title>
+    <title>EdShira - Gestión Ágil</title>
     <link rel="stylesheet" href="/static/styles/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+
+    <div id="init-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="init-modal-title">¡Bienvenido a EdShira! 🚀</h2>
+            </div>
+            
+            <div class="modal-body">
+                <div id="login-section" style="display: none;">
+                    <p class="modal-subtitle">Para empezar, ingresá tu usuario.</p>
+                    <div class="form-group">
+                        <input type="text" id="username-input" class="modal-input" placeholder="Ej: Seba" autocomplete="off">
+                        <p id="login-error" class="error-text" style="display: none;">Por favor, ingresá un nombre.</p>
+                    </div>
+                    <button id="btn-login" class="btn-primary w-100">Ingresar</button>
+                </div>
+
+                <div id="project-section" style="display: none;">
+                    <p class="modal-subtitle">No tenés proyectos. Elegí uno para suscribirte:</p>
+                    <div class="form-group">
+                        <select id="project-select" class="modal-input">
+                            <option value="">Cargando proyectos...</option>
+                        </select>
+                    </div>
+                    <button id="btn-subscribe" class="btn-primary w-100">Suscribirse</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="create-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Crear Nueva Tarea</h2>
+                <button class="close-modal" id="close-create-modal">✖</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Tipo de Tarea</label>
+                    <select id="create-type" class="modal-input">
+                        <option value="HU">Historia de Usuario</option>
+                        <option value="Bug">Bug</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="create-title" class="modal-input" placeholder="Ej: Armar API de Login">
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="create-desc" class="modal-input" rows="4" placeholder="Detalles de la tarea..."></textarea>
+                </div>
+                <button id="btn-create-task" class="btn-primary w-100">Crear Tarea</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <div class="view-header-title">
+                    <span id="view-code" class="task-code">BBM-0</span>
+                    <h2 id="view-title">Título de la tarea</h2>
+                </div>
+                <button class="close-modal" id="close-view-modal">✖</button>
+            </div>
+            <div class="modal-body view-grid">
+                <div class="view-main">
+                    <label>Descripción</label>
+                    <div id="view-desc" class="view-box">Cargando...</div>
+                </div>
+                <div class="view-sidebar">
+                    <div class="view-detail"><strong>Tipo:</strong> <span id="view-type">-</span></div>
+                    <div class="view-detail"><strong>Estado:</strong> <span id="view-status">-</span></div>
+                    <div class="view-detail"><strong>Sprint:</strong> <span id="view-sprint">-</span></div>
+                    <div class="view-detail"><strong>Proyecto:</strong> <span id="view-project">-</span></div>
+                    <div class="view-detail"><strong>Creador:</strong> <span id="view-creator">-</span></div>
+                    <div class="view-detail"><strong>Responsable:</strong> <span id="view-owner">-</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="app-container">
+        
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="brand-container">
@@ -50,79 +133,51 @@
                 </div>
                 
                 <div class="navbar-actions">
-                    <button class="btn-create">+ Crear historia</button>
+                    <button class="btn-create" id="btn-open-create">+ Crear historia</button>
                     <div class="user-profile">
-                        <div class="user-avatar">S</div>
-                        <span class="user-name">Seba</span>
+                        <div class="user-avatar" id="nav-avatar">?</div>
+                        <span class="user-name" id="nav-username">Cargando...</span>
                     </div>
                 </div>
             </header>
 
             <header class="top-header">
-                <h1>Proyecto {proyectName}</h1>
+                <h1 id="project-title-display">Proyecto Activo</h1>
             </header>
 
             <section class="sprint-header">
-                <h2>Sprint {nroSprint}</h2>
+                <h2 id="sprint-title-display">Sprint Activo</h2>
                 <button class="btn-primary">Finalizar sprint</button>
             </section>
 
             <div class="kanban-board">
                 <div class="kanban-column" data-status="todo">
-                    <div class="column-header">
-                        <h3>To Do</h3>
-                    </div>
+                    <div class="column-header"><h3>To Do</h3></div>
                     <div class="kanban-cards">
-                        <div class="card bug-card" draggable="true" id="task-1">
+                        <div class="card bug-card" draggable="true" id="8">
                             <div class="card-content">
-                                <h4 class="task-title">Error al iniciar</h4>
-                                <p class="task-desc">La aplicación crashea al hacer login con un usuario recién registrado.</p>
+                                <h4 class="task-title">Crear bibite da error 2</h4>
+                                <p class="task-desc">Al cargar el archivo y ejecutar procesar...</p>
                             </div>
                             <div class="card-footer">
-                                <span class="task-code">BUG-402</span>
-                            </div>
-                        </div>
-                        
-                        <div class="card story-card" draggable="true" id="task-2">
-                            <div class="card-content">
-                                <h4 class="task-title">Armar API</h4>
-                                <p class="task-desc">Desarrollar los endpoints principales para la gestión de usuarios.</p>
-                            </div>
-                            <div class="card-footer">
-                                <span class="task-code">US-105</span>
+                                <span class="task-code">BBM-5</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="kanban-column" data-status="inprogress">
-                    <div class="column-header">
-                        <h3>En Progreso</h3>
-                    </div>
+                    <div class="column-header"><h3>En Progreso</h3></div>
                     <div class="kanban-cards"></div>
                 </div>
 
                 <div class="kanban-column" data-status="testing">
-                    <div class="column-header">
-                        <h3>Testing</h3>
-                    </div>
-                    <div class="kanban-cards">
-                        <div class="card bug-card" draggable="true" id="task-3">
-                            <div class="card-content">
-                                <h4 class="task-title">Error al cargar</h4>
-                                <p class="task-desc">El dashboard queda en blanco si la base de datos demora en responder.</p>
-                            </div>
-                            <div class="card-footer">
-                                <span class="task-code">BUG-388</span>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="column-header"><h3>Testing</h3></div>
+                    <div class="kanban-cards"></div>
                 </div>
 
                 <div class="kanban-column" data-status="done">
-                    <div class="column-header">
-                        <h3>Done</h3>
-                    </div>
+                    <div class="column-header"><h3>Done</h3></div>
                     <div class="kanban-cards"></div>
                 </div>
             </div>

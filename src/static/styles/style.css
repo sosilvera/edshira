@@ -21,7 +21,7 @@ body {
 
 /* --- Panel Lateral (Sidebar) --- */
 .sidebar {
-    width: 260px; /* Ancho expandido */
+    width: 260px;
     background-color: #1e293b;
     border: 1px solid #334155;
     border-radius: 12px;
@@ -30,16 +30,12 @@ body {
     padding: 24px 16px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden; /* Clave para que los textos no salgan al achicarse */
+    overflow: hidden;
 }
-
-/* Estado Colapsado de la Sidebar */
 .sidebar.collapsed {
-    width: 80px; /* Ancho de la barra fina */
+    width: 80px;
     padding: 24px 12px;
 }
-
-/* Cabecera y Logos de la Sidebar */
 .sidebar-header {
     display: flex;
     justify-content: space-between;
@@ -47,20 +43,14 @@ body {
     margin-bottom: 40px;
     color: #f8fafc;
 }
-
 .brand-container h2 {
     font-size: 1.5rem;
     font-weight: 600;
 }
-
 .mini-logo { display: none; }
 .full-logo { display: block; }
 
-/* Comportamiento de logos y flecha al colapsar */
-.sidebar.collapsed .sidebar-header {
-    flex-direction: column;
-    gap: 24px;
-}
+.sidebar.collapsed .sidebar-header { flex-direction: column; gap: 24px; }
 .sidebar.collapsed .full-logo { display: none; }
 .sidebar.collapsed .mini-logo { display: block; }
 
@@ -71,23 +61,17 @@ body {
     transition: transform 0.3s ease, color 0.2s ease;
 }
 .collapse-icon:hover { color: #f1f5f9; }
+.sidebar.collapsed .collapse-icon { transform: rotate(180deg); }
 
-/* Gira la flecha 180 grados al colapsar */
-.sidebar.collapsed .collapse-icon {
-    transform: rotate(180deg);
-}
-
-/* Botones de Navegación */
 .sidebar-nav {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
-
 .nav-btn {
     background-color: transparent;
-    border: 1px solid transparent; /* Sin borde de inicio para diseño más limpio */
+    border: 1px solid transparent;
     border-radius: 8px;
     padding: 12px 16px;
     display: flex;
@@ -98,197 +82,30 @@ body {
     color: #cbd5e1;
     cursor: pointer;
     transition: all 0.2s ease;
-    white-space: nowrap; /* Evita que el texto baje de línea */
+    white-space: nowrap;
 }
-
 .nav-btn:hover {
     background-color: #334155;
     color: #ffffff;
     border-color: #475569;
 }
-
 .nav-icon {
     font-size: 1.2rem;
-    min-width: 24px; /* Asegura que el icono tenga espacio fijo */
+    min-width: 24px;
     text-align: center;
 }
+.sidebar.collapsed .nav-btn { padding: 12px 0; justify-content: center; }
+.sidebar.collapsed .nav-text { display: none; }
+.sidebar-footer { margin-top: auto; }
 
-/* Comportamiento de botones al colapsar */
-.sidebar.collapsed .nav-btn {
-    padding: 12px 0;
-    justify-content: center; /* Centra el icono */
-}
-.sidebar.collapsed .nav-text {
-    display: none; /* Oculta el texto */
-}
-
-.sidebar-footer {
-    margin-top: auto;
-}
-
-/* --- Contenido Principal (Se mantiene igual que antes) --- */
+/* --- Contenido Principal --- */
 .main-content {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    overflow: hidden; /* Para que el tablero haga scroll interno */
+    overflow: hidden;
 }
-
-.top-header {
-    background-color: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 12px;
-    padding: 20px 30px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-}
-
-.top-header h1 {
-    font-size: 1.6rem;
-    font-weight: 600;
-}
-
-.sprint-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 10px;
-}
-
-.sprint-header h2 {
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: #e2e8f0;
-}
-
-.btn-primary {
-    background-color: #3b82f6;
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 24px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.btn-primary:hover {
-    background-color: #2563eb;
-}
-
-/* --- Tablero Kanban (Se mantiene igual que antes) --- */
-.kanban-board {
-    display: flex;
-    flex-grow: 1;
-    gap: 20px;
-    overflow-x: auto;
-    padding-bottom: 10px;
-}
-
-.kanban-column {
-    flex: 1;
-    min-width: 280px;
-    background-color: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-}
-
-.column-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid #334155;
-}
-
-.column-header h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #f1f5f9;
-}
-
-.kanban-cards {
-    padding: 16px;
-    flex-grow: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    transition: background-color 0.2s ease;
-}
-
-.kanban-cards.drag-over {
-    background-color: #2a384e;
-    border-radius: 0 0 12px 12px;
-}
-
-/* --- Tarjetas (Cards) --- */
-.card {
-    background-color: #2b3648;
-    border-radius: 8px;
-    cursor: grab;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-    border: 1px solid #3f4e66;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-    border-color: #64748b;
-}
-
-.card:active {
-    cursor: grabbing;
-}
-
-.card.dragging {
-    opacity: 0.6;
-    transform: scale(1.02);
-}
-
-.card-content {
-    padding: 16px;
-}
-
-.task-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #f8fafc;
-    margin-bottom: 8px;
-}
-
-.task-desc {
-    font-size: 0.85rem;
-    color: #94a3b8;
-    line-height: 1.4;
-}
-
-.card-footer {
-    padding: 10px 16px;
-    background-color: rgba(15, 23, 42, 0.3);
-    border-top: 1px solid #3f4e66;
-    display: flex;
-    justify-content: flex-end;
-    border-radius: 0 0 8px 8px;
-}
-
-.task-code {
-    font-size: 0.75rem;
-    font-family: monospace;
-    font-weight: 600;
-    background-color: #0f172a;
-    color: #cbd5e1;
-    padding: 4px 8px;
-    border-radius: 4px;
-}
-
-.bug-card { border-left: 4px solid #ef4444; }
-.story-card { border-left: 4px solid #10b981; }
-
-/* --- Barra de Navegación Global (NUEVA) --- */
 .global-navbar {
     display: flex;
     justify-content: space-between;
@@ -299,21 +116,13 @@ body {
     padding: 12px 24px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
-
 .search-box {
     position: relative;
     display: flex;
     align-items: center;
     width: 320px;
 }
-
-.search-icon {
-    position: absolute;
-    left: 12px;
-    font-size: 0.9rem;
-    color: #94a3b8;
-}
-
+.search-icon { position: absolute; left: 12px; font-size: 0.9rem; color: #94a3b8; }
 .search-input {
     width: 100%;
     background-color: #0f172a;
@@ -323,67 +132,112 @@ body {
     color: #f1f5f9;
     font-size: 0.9rem;
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
-.search-input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-
-.navbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-}
-
+.search-input:focus { border-color: #3b82f6; }
+.navbar-actions { display: flex; align-items: center; gap: 24px; }
 .btn-create {
-    background-color: #10b981; /* Verde esmeralda para acción principal */
+    background-color: #10b981;
     color: #ffffff;
     border: none;
     border-radius: 8px;
     padding: 10px 20px;
     font-weight: 600;
-    font-size: 0.95rem;
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.2s ease;
 }
-
-.btn-create:hover {
-    background-color: #059669;
-    transform: translateY(-1px);
-}
-
-.user-profile {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 8px;
-    transition: background-color 0.2s ease;
-}
-
-.user-profile:hover {
-    background-color: #2a384e;
-}
-
+.user-profile { display: flex; align-items: center; gap: 12px; }
 .user-avatar {
-    width: 36px;
-    height: 36px;
-    /* Degradado sutil para el avatar */
+    width: 36px; height: 36px;
     background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
     border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: 600;
-    color: white;
-    font-size: 1rem;
+    display: flex; justify-content: center; align-items: center;
+    font-weight: 600; color: white;
 }
 
-.user-name {
-    font-weight: 500;
-    font-size: 0.95rem;
-    color: #f8fafc;
+.top-header {
+    background-color: #1e293b; border: 1px solid #334155; border-radius: 12px;
+    padding: 20px 30px;
 }
+.sprint-header { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
+.btn-primary {
+    background-color: #3b82f6; color: #ffffff; border: none; border-radius: 8px;
+    padding: 10px 24px; font-weight: 600; cursor: pointer;
+}
+.w-100 { width: 100%; }
+
+/* --- Tablero Kanban --- */
+.kanban-board {
+    display: flex; flex-grow: 1; gap: 20px; overflow-x: auto; padding-bottom: 10px;
+}
+.kanban-column {
+    flex: 1; min-width: 280px; background-color: #1e293b;
+    border: 1px solid #334155; border-radius: 12px; display: flex; flex-direction: column;
+}
+.column-header { padding: 16px 20px; border-bottom: 1px solid #334155; }
+.kanban-cards {
+    padding: 16px; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
+}
+.kanban-cards.drag-over { background-color: #2a384e; }
+
+.card {
+    background-color: #2b3648; border-radius: 8px; cursor: grab;
+    display: flex; flex-direction: column; border: 1px solid #3f4e66;
+}
+.card.dragging { opacity: 0.6; transform: scale(1.02); }
+.card-content { padding: 16px; pointer-events: none; }
+.task-title { margin-bottom: 8px; }
+.task-desc { font-size: 0.85rem; color: #94a3b8; }
+.card-footer {
+    padding: 10px 16px; background-color: rgba(15, 23, 42, 0.3);
+    border-top: 1px solid #3f4e66; display: flex; justify-content: flex-end;
+}
+.task-code {
+    font-size: 0.75rem; font-family: monospace; font-weight: 600;
+    background-color: #0f172a; color: #cbd5e1; padding: 4px 8px; border-radius: 4px;
+}
+.bug-card { border-left: 4px solid #ef4444; }
+.story-card { border-left: 4px solid #10b981; }
+
+/* ========================================== */
+/* ESTILOS DE LOS MODALES                     */
+/* ========================================== */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px);
+    display: flex; justify-content: center; align-items: center; z-index: 1000;
+}
+.modal-content {
+    background-color: #1e293b; border: 1px solid #334155; border-radius: 12px;
+    padding: 24px; width: 100%; max-width: 450px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+.modal-lg { max-width: 700px; }
+.modal-header {
+    display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;
+}
+.modal-subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 16px; }
+.close-modal {
+    background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;
+}
+.close-modal:hover { color: #ef4444; }
+
+.form-group { margin-bottom: 16px; text-align: left; }
+.form-group label { display: block; margin-bottom: 6px; font-size: 0.9rem; color: #cbd5e1; }
+.modal-input {
+    width: 100%; background-color: #0f172a; border: 1px solid #334155;
+    border-radius: 8px; padding: 12px; color: #f1f5f9; font-size: 0.95rem; outline: none;
+}
+.modal-input:focus { border-color: #3b82f6; }
+.error-text { color: #ef4444; font-size: 0.85rem; margin-top: 6px; }
+
+/* Grid para Visualizar Historia */
+.view-grid { display: flex; gap: 24px; }
+.view-main { flex: 2; }
+.view-sidebar { flex: 1; background: #0f172a; padding: 16px; border-radius: 8px; border: 1px solid #334155; }
+.view-box {
+    background: #0f172a; border: 1px solid #334155; border-radius: 8px;
+    padding: 16px; min-height: 100px; font-size: 0.95rem; line-height: 1.5; color: #cbd5e1;
+}
+.view-detail { margin-bottom: 12px; font-size: 0.9rem; display: flex; flex-direction: column; gap: 4px; }
+.view-detail strong { color: #94a3b8; }
+.view-detail span { color: #f1f5f9; font-weight: 500; }
+.view-header-title { display: flex; align-items: center; gap: 12px; }
