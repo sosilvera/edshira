@@ -28,6 +28,14 @@ CREATE TABLE Proyecto (
     FOREIGN KEY (idUser) REFERENCES Usuarios(idUsuario) ON DELETE SET NULL
 );
 
+CREATE TABLE Usuario_Proyecto (
+    idUsuarioProyecto INT AUTO_INCREMENT PRIMARY KEY,
+    idUsuario INT NOT NULL,
+    idProyecto INT NOT NULL,
+    FOREIGN KEY (idUsuario) REFERENCES Usuarios(idUsuario) ON DELETE CASCADE,
+    FOREIGN KEY (idProyecto) REFERENCES Proyecto(idProyecto) ON DELETE CASCADE
+);
+
 -- 3. Tablas de Nivel 2 (Dependen de Proyecto)
 CREATE TABLE Proyecto_Sprint (
     idProySprint INT AUTO_INCREMENT PRIMARY KEY,

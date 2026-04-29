@@ -1,10 +1,10 @@
 ### Gestion de proyecto
 
 - Proyecto
-    - Traer proyectos de un usuario: /proyectosUsuario/{idUsuario}
-    - Asignar usuario a un proyecto: /asignar_proyecto
-    - Listar proyectos: /get_proyectos
-    - Crear proyecto: /crear_proyecto
+    - Traer proyectos de un usuario: /proyectosUsuario/{idUsuario} [LISTO]
+    - Asignar usuario a un proyecto: /asignar_proyecto [LISTO]
+    - Listar proyectos: /get_proyectos [LISTO]
+    - Crear proyecto: /crear_proyecto 
 - Sprint
     - Crear sprint
     - Cerrar sprint
@@ -98,7 +98,8 @@ Cuando carga la página:
 - Revisar en CACHE si hay un usuario logueado
 	- Si NO hay usuario:
 		- Mostrar modal para que ingrese usuario
-		- Guardarlo en cache
+        - Llama a la API /get_usuario/{nombre usuario}
+        - Si devuelve el ID, guardarlo en CACHE, si no, crear el usuario con /crear_usuario y guardar el id en Cache
 		- Llamar a la API /proyectosUsuario/{idUsuario}, el cual devuelve un array de idProyectos
 			- Elegir el primer elemento del array
 			- Guardarlo en cache

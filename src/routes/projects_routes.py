@@ -6,6 +6,14 @@ from models.models import CreateSprintRequest, CreateTaskRequest, UpdateEstadoRe
 
 router = APIRouter(prefix="/edshira/api/projects")
 
+@router.get("/get_user_id/{nombreUsuario}")
+async def get_user_id(nombreUsuario: str, db: Session = Depends(get_db)):
+    q = Querys(db)
+    user = q.getUserByName(nombreUsuario)
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return user
+
 @router.get("/proyectos_usuario/{idUsuario}")
 async def get_proyectos_usuario(idUsuario: int, db: Session = Depends(get_db)):
     q = Querys(db)
@@ -92,4 +100,12 @@ async def asignar_responsable(payload: AssignResponsibleRequest, db: Session = D
     result = q.assignResponsable(payload.idTarea, payload.idResponsable)
 
     return result
+
+
+@router.get("/get_usuario_id/{nombreUsuario}")
+async def get_usuario_id(nombreUsuario: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.nombre == nombreUsuario).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return {"id": user.id}
 

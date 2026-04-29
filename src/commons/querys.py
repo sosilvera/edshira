@@ -17,6 +17,14 @@ class Querys():
 
         self.session = db
 
+    def getUserByName(self, nombreUsuario: str):
+        try:
+            user = self.session.query(Usuario.idUsuario).filter(Usuario.Nombre == nombreUsuario).first()
+            return {"id": user[0]} if user else None
+        except Exception as e:
+            print(f"Error al obtener el usuario por nombre: {str(e)}")
+            return None
+
     def getProyectosUsuario(self, idUsuario: int):
         try:
             proyectos = self.session.query(Proyecto.idProyecto, Proyecto.Nombre).join(UsuarioProyecto, UsuarioProyecto.idProyecto == Proyecto.idProyecto).filter(UsuarioProyecto.idUsuario == idUsuario).all()

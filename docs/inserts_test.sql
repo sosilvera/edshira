@@ -18,6 +18,12 @@ INSERT INTO Proyecto (Nombre, Codigo, idUser) VALUES
 ('Bibites_Maker', 'BBM', 1),
 ('Migración Oracle Fusion', 'MOF', 1);
 
+INSERT INTO Usuario_Proyecto (idUsuario, idProyecto) VALUES 
+(1, 1), -- Sebastian en Bibites_Maker
+(2, 1), -- Ximena en Bibites_Maker
+(3, 1), -- Ivan en Bibites_Maker
+(1, 2); -- Sebastian en Migración Oracle Fusion
+
 -- 3. Tablas de Nivel 2 (Dependen de Proyecto y Usuarios)
 
 -- Sprints para los proyectos
