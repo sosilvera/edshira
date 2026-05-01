@@ -39,14 +39,17 @@ document.addEventListener('DOMContentLoaded', () => {
         navAvatar.textContent = userName.charAt(0).toUpperCase();
 
         // 2. Validar si tiene proyecto asignado
-        if (!projectId) {
+        if (!projectId || isNaN(Number(projectId))) {
+            localStorage.removeItem('projectId');
+            projectId = null;
             try {
-                const res = await fetch(`${API_URL}/proyectosUsuario/${userId}`);
+                const res = await fetch(`${API_URL}/proyectos_usuario/${userId}`);
                 const proyectosArray = await res.json();
 
                 if (proyectosArray && proyectosArray.length > 0) {
                     // Elegir el primero y guardar en caché
-                    projectId = proyectosArray[0];
+                    projectId = proyectosArray[0].idProyecto;
+                    console.log(`Usuario tiene proyectos asignados. Usando proyecto ID: ${projectId}`);
                     localStorage.setItem('projectId', projectId);
                 } else {
                     // Mostrar listado de proyectos a suscribir
