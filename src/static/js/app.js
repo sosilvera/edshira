@@ -49,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (proyectosArray && proyectosArray.length > 0) {
                     // Elegir el primero y guardar en caché
                     projectId = proyectosArray[0].idProyecto;
-                    console.log(`Usuario tiene proyectos asignados. Usando proyecto ID: ${projectId}`);
                     localStorage.setItem('projectId', projectId);
                 } else {
                     // Mostrar listado de proyectos a suscribir
@@ -165,13 +164,89 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.ok) {
                 const sprintData = await res.json();
                 console.log("Sprint Activo cargado:", sprintData);
-                // Aquí renderizarías las tarjetas dinámicamente en un futuro
+                
+                // 1. Limpiamos todas las columnas por si recargamos la data
+                document.querySelectorAll('.kanban-cards').forEach(col => col.innerHTML = '');
+
+                // Opcional: Actualizar el título del Sprint en la UI
+                const sprintTitle = document.getElementById('sprint-title-display');
+                if (sprintTitle && sprintData.value.idSprint) {
+                    sprintTitle.textContent = `Sprint ${sprintData.value.idSprint}`;
+                }
+
+                // 2. Extraer el array de tareas y renderizar una por una
+                const tareas = sprintData.value.tareas || [];
+                tareas.forEach(tarea => {
+                    renderizarTarjeta(tarea);
+                });
             }
         } catch (error) {
             console.error("Error al cargar el sprint:", error);
         }
     }
 
+    // --- Nueva Función para crear e inyectar tarjetas ---
+    function renderizarTarjeta(tarea) {
+        // A. Diccionario para mapear el estado de la BD con el HTML
+        const mapaEstados = {
+            "To Do": "todo",
+            "In Progress": "inprogress",
+            "Testing": "testing",
+            "Done": "done"
+        };
+        
+        // Si el estado viene raro, lo mandamos a To Do por defecto
+        const columnaStatus = mapaEstados[tarea.estado] || "todo"; 
+
+        // B. Seleccionamos el contenedor de la columna correcta
+        const contenedor = document.querySelector(`.kanban-column[data-status="${columnaStatus}"] .kanban-cards`);
+        if (!contenedor) return;
+
+        // C. Definimos el color según el tipo
+        const tipoClase = tarea.tipo === "Bug" ? "bug-card" : "story-card";
+
+        // Creamos el elemento físico de la tarjeta
+        const card = document.createElement('div');
+        card.className = `card ${tipoClase}`;
+        card.setAttribute('draggable', 'true');
+        card.id = tarea.idTarea; // Usamos el idTarea como ID del elemento HTML
+
+        // Armamos el interior (Podés sumar titulo y descripción si la API lo envía luego)
+        card.innerHTML = `
+            <div class="card-content">
+                <h4 class="task-title">${tarea.tipo} ${tarea.codigo}</h4>
+                <p class="task-desc">Sin descripción provista por la API.</p>
+            </div>
+            <div class="card-footer">
+                <span class="task-code">${tarea.codigo}</span>
+            </div>
+        `;
+
+        // Le enseñamos a esta NUEVA tarjeta cómo arrastrarse
+        card.addEventListener('dragstart', () => {
+            card.classList.add('dragging');
+        });
+
+        card.addEventListener('dragend', () => {
+            card.classList.remove('dragging');
+            const parentColumn = card.closest('.kanban-column');
+            if (parentColumn) {
+                const nuevoEstado = parentColumn.getAttribute('data-status');
+                console.log(`La tarea ${card.id} cambió a: ${nuevoEstado}`);
+                fetch(`${API_URL}/actualizar_estado`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idTarea: card.id, estado: nuevoEstado })
+                });
+                
+                // Acá podrías hacer el fetch para actualizar el estado en tu base de datos
+
+            }
+        });
+
+        // G. La insertamos en la columna
+        contenedor.appendChild(card);
+    }
 
     // ==========================================
     // LÓGICA DE MODALES DE HISTORIA
@@ -215,23 +290,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('view-desc').innerHTML = "Cargando datos...";
 
         try {
-            // Llamada a la API que pediste (Simulada para que no falle si no tenes el backend aún)
-            // const res = await fetch(`${API_URL}/tarea/${taskId}`);
-            // const data = await res.json();
-            
-            // Reemplazo temporal simulando el JSON que pasaste:
-            const data = {
-                "idTarea": taskId,
-                "codigo": "BBM-5",
-                "tipo": "Bug",
-                "estado": "To Do",
-                "titulo": "Crear bibite da error 2",
-                "descripcion": "Al cargar el archivo y ejecutar procesar, da error",
-                "nroSprint": null,
-                "nombre_proyecto": "Bibites_Maker",
-                "creador": "Sebastian Silvera",
-                "responsable": "Ivan Tomir"
-            };
+            // Llama a get_Tarea para los detalles de la tarea
+            const res = await fetch(`${API_URL}/get_tarea/${taskId}`);
+            const data = await res.json();
 
             // Volcar datos al modal
             document.getElementById('view-code').textContent = data.codigo;
@@ -272,6 +333,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const parentColumn = card.closest('.kanban-column');
                 if(parentColumn) {
                     const nuevoEstado = parentColumn.getAttribute('data-status');
+                    fetch(`${API_URL}/actualizar_estado`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ idTarea: card.id, idEstado: nuevoEstado })
+                    });
                     console.log(`La tarea ${card.id} cambió a: ${nuevoEstado}`);
                 }
             });

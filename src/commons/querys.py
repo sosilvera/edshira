@@ -172,6 +172,14 @@ class Querys():
             print(f"Error al crear la tarea: {str(e)}")
             return {"value": None}
 
+    def getEstadoByName(self, nombreEstado: str):
+        try:
+            estado = self.session.query(EstadoTarea.idEstado).filter(EstadoTarea.Nombre == nombreEstado).first()
+            return estado[0]
+        except Exception as e:
+            print(f"Error al obtener el estado por nombre: {str(e)}")
+            return None
+
     def getTarea(self, idTarea: int):
         try:
             creador = aliased(Usuario)

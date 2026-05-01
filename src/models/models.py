@@ -22,7 +22,7 @@ CreateTaskRequest.model_rebuild()
 
 class UpdateEstadoRequest(BaseModel):
     idTarea: int
-    idEstado: int
+    estado: str
 
 class AssignResponsibleRequest(BaseModel):
     idTarea: int
