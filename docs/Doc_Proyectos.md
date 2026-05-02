@@ -114,6 +114,3 @@ Cuando carga la página:
 		- Con el idProyecto, llamar la api POST /asignar_proyecto con el idUsuario e idProyecto
 
 - Llamar API /sprintActivo/{idProject} con el idProject que tiene el usuario en la cache
-
-
-[TO DO] Las tareas deberian cargar idEstado y Descripcion cuando carga, cosa de poder tomar el idEstado y enviarlo en la api de actualizacoin, asi no depende del nombre

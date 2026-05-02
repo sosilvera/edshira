@@ -31,3 +31,7 @@ class AssignResponsibleRequest(BaseModel):
 class AssignProjectRequest(BaseModel):
     idUsuario: int
     idProyecto: int
+
+class AssignSprintRequest(BaseModel):
+    idTarea: int
+    idSprint: int

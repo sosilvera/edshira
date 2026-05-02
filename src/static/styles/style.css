@@ -241,3 +241,115 @@ body {
 .view-detail strong { color: #94a3b8; }
 .view-detail span { color: #f1f5f9; font-weight: 500; }
 .view-header-title { display: flex; align-items: center; gap: 12px; }
+
+/* ========================================== */
+/* ESTILOS ESPECÍFICOS DE LA VISTA BACKLOG    */
+/* ========================================== */
+
+.btn-secondary {
+    background-color: transparent;
+    color: #cbd5e1;
+    border: 1px solid #475569;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #334155;
+    color: #ffffff;
+    border-color: #64748b;
+}
+
+.backlog-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    padding-bottom: 20px;
+}
+
+.backlog-row {
+    display: flex;
+    align-items: center;
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 12px 20px;
+    gap: 20px;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.backlog-row:hover {
+    background-color: #2b3648;
+    transform: translateX(4px);
+}
+
+/* Indicadores de tipo (Bug vs Story) */
+.backlog-row.bug-row {
+    border-left: 4px solid #ef4444;
+}
+.backlog-row.story-row {
+    border-left: 4px solid #10b981;
+}
+
+/* Textos dentro de la fila */
+.row-code {
+    font-family: monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    min-width: 80px;
+}
+.bug-row .row-code { color: #ef4444; }
+.story-row .row-code { color: #10b981; }
+
+.row-title {
+    flex-grow: 1;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #f1f5f9;
+}
+
+/* Avatar pequeño para el responsable */
+.row-assignee {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #0f172a;
+    border: 1px solid #475569;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    flex-shrink: 0;
+}
+
+/* Dropdown de Sprints */
+.row-sprint-select {
+    background-color: #0f172a;
+    border: 1px solid #475569;
+    color: #f1f5f9;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    outline: none;
+    cursor: pointer;
+    min-width: 160px;
+    transition: border-color 0.2s ease;
+}
+
+.row-sprint-select:focus {
+    border-color: #3b82f6;
+}
+
+.loading-text {
+    color: #94a3b8;
+    text-align: center;
+    padding: 40px;
+    font-size: 1rem;
+}

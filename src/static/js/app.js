@@ -1,4 +1,8 @@
 const API_URL = 'http://localhost:30095/edshira/api/projects'; // Ajustar según entorno
+const MAP_TYPES = {
+    "Bug": 1,
+    "HU": 2
+};
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -25,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const userId = localStorage.getItem('userId');
         const userName = localStorage.getItem('userName');
         let projectId = localStorage.getItem('projectId');
+        let projectCode = localStorage.getItem('projectCode');
 
         // 1. Revisar si hay usuario logueado
         if (!userId) {
@@ -41,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 2. Validar si tiene proyecto asignado
         if (!projectId || isNaN(Number(projectId))) {
             localStorage.removeItem('projectId');
+            localStorage.removeItem('projectCode');
             projectId = null;
             try {
                 const res = await fetch(`${API_URL}/proyectos_usuario/${userId}`);
@@ -50,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Elegir el primero y guardar en caché
                     projectId = proyectosArray[0].idProyecto;
                     localStorage.setItem('projectId', projectId);
+                    localStorage.setItem('projectCode', proyectosArray[0].codigo);
                 } else {
                     // Mostrar listado de proyectos a suscribir
                     await loadProjectsForSubscription(userId);
@@ -102,7 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const projArray = await projRes.json();
 
             if (projArray && projArray.length > 0) {
-                localStorage.setItem('projectId', projArray[0]);
+                localStorage.setItem('projectId', projArray[0].idProyecto);
+                localStorage.setItem('projectCode', projArray[0].codigo);
             }
             
             // Recargar página
@@ -214,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Armamos el interior (Podés sumar titulo y descripción si la API lo envío luego)
         card.innerHTML = `
             <div class="card-content">
-                <h4 class="task-title">${tarea.tipo} ${tarea.codigo}</h4>
+                <h4 class="task-title">${tarea.titulo}</h4>
                 <p class="task-desc" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${tarea.descripcion}</p>
             </div>
             <div class="card-footer">
@@ -245,8 +253,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ idTarea: card.id, idEstado: idEstado })
                 });
-                
-                // Acá podrías hacer el fetch para actualizar el estado en tu base de datos
 
             }
         });
@@ -274,7 +280,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const desc = document.getElementById('create-desc').value;
         
         console.log("Nueva Tarea a enviar a API:", { type, title, desc });
-        // Simulación: fetch POST a /crear_tarea
+        
+        const idUser = localStorage.getItem('userId');
+        const idProject = localStorage.getItem('projectId');
+        const projectCode = localStorage.getItem('projectCode');
+
+        res = fetch(`${API_URL}/crear_tarea`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                "codigoProyecto": projectCode,
+                "titulo": title,
+                "descripcion": desc,
+                "idTipo": MAP_TYPES[type],
+                "idUsuario": idUser,
+                "idProyecto": idProject
+            })
+        });
+
+        console.log("Respuesta de creación:", res);
+
         createModal.style.display = 'none';
         
         // Limpiar formulario

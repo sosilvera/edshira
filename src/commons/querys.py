@@ -27,8 +27,8 @@ class Querys():
 
     def getProyectosUsuario(self, idUsuario: int):
         try:
-            proyectos = self.session.query(Proyecto.idProyecto, Proyecto.Nombre).join(UsuarioProyecto, UsuarioProyecto.idProyecto == Proyecto.idProyecto).filter(UsuarioProyecto.idUsuario == idUsuario).all()
-            return [{"idProyecto": p[0], "nombre": p[1]} for p in proyectos]
+            proyectos = self.session.query(Proyecto.idProyecto, Proyecto.Nombre, Proyecto.Codigo).join(UsuarioProyecto, UsuarioProyecto.idProyecto == Proyecto.idProyecto).filter(UsuarioProyecto.idUsuario == idUsuario).all()
+            return [{"idProyecto": p[0], "nombre": p[1], "codigo": p[2]} for p in proyectos]
         except Exception as e:
             print(f"Error al obtener los proyectos del usuario: {str(e)}")
             return []
@@ -80,9 +80,9 @@ class Querys():
             if not sprint:
                 return {"value": None}
             
-            tareas = self.session.query(Tarea.idTarea, Tarea.Codigo, TipoTarea.Nombre, EstadoTarea.Nombre, Tarea.Descripcion).join(TipoTarea, TipoTarea.idTipo == Tarea.idTipo).join(EstadoTarea, EstadoTarea.idEstado == Tarea.idEstadoTarea).filter(Tarea.idSprint == sprint.idProySprint).all()
+            tareas = self.session.query(Tarea.idTarea, Tarea.Codigo, Tarea.Titulo, TipoTarea.Nombre, EstadoTarea.Nombre, Tarea.Descripcion).join(TipoTarea, TipoTarea.idTipo == Tarea.idTipo).join(EstadoTarea, EstadoTarea.idEstado == Tarea.idEstadoTarea).filter(Tarea.idSprint == sprint.idProySprint).all()
             
-            tareas_list = [{"idTarea": t[0], "codigo": t[1], "tipo": t[2], "estado": t[3], "descripcion": t[4]} for t in tareas]
+            tareas_list = [{"idTarea": t[0], "codigo": t[1], "titulo": t[2], "tipo": t[3], "estado": t[4], "descripcion": t[5]} for t in tareas]
             
             return {
                 "value": {
@@ -132,8 +132,7 @@ class Querys():
         print("IdProyecto:", idProyecto)
         
         counter = self.session.query(func.count(Tarea.idTarea)).\
-            join(ProyectoSprint, ProyectoSprint.idProySprint == Tarea.idSprint, isouter=True).\
-            join(Proyecto, Proyecto.idProyecto == ProyectoSprint.idProyecto).\
+            join(Proyecto, Proyecto.idProyecto == Tarea.idProyecto).\
             filter(Proyecto.idProyecto == idProyecto).group_by(Proyecto.idProyecto).scalar()
         
         print("Counter:", counter)
@@ -142,7 +141,7 @@ class Querys():
     def createTarea(self, payload):
         try:
             # Obtener el código del proyecto
-            project_code = self.session.query(Proyecto.Codigo).filter(Proyecto.idProyecto == payload.idProyecto).scalar()
+            #project_code = self.session.query(Proyecto.Codigo).filter(Proyecto.idProyecto == payload.idProyecto).scalar()
 
             # Contar las tareas en los sprints del proyecto
             count_tareas = self.countTareasProyecto(payload.idProyecto)
@@ -150,7 +149,7 @@ class Querys():
             print("Cantidad de tareas en el proyecto:", count_tareas)
 
             # Generar el código
-            codigo = f"{project_code}-{count_tareas + 1}"
+            codigo = f"{payload.codigoProyecto}-{count_tareas + 1}"
             print("Código generado:", codigo)
             
             nueva_tarea = Tarea(
@@ -221,6 +220,34 @@ class Querys():
             print(f"Error al obtener la tarea: {str(e)}")
             return None
 
+
+    def getBacklog(self, idProyecto: int):
+        try:
+            tareas = self.session.query(Tarea.idTarea, Tarea.Codigo, TipoTarea.Nombre, EstadoTarea.Nombre, Tarea.Titulo, Tarea.Descripcion, Usuario.Nombre).\
+            join(TipoTarea, TipoTarea.idTipo == Tarea.idTipo).\
+            join(EstadoTarea, EstadoTarea.idEstado == Tarea.idEstadoTarea).\
+            join(Usuario, Usuario.idUsuario == Tarea.UsuarioCreador).\
+            filter(Tarea.idProyecto == idProyecto, Tarea.idSprint == None).all()
+            
+            if tareas:
+                return [{"idTarea": t[0], "codigo": t[1], "tipo": t[2], "estado": t[3], "titulo": t[4], "descripcion": t[5], "creador": t[6]} for t in tareas]
+            else:
+                return None
+        except Exception as e:
+            print(f"Error al obtener el backlog: {str(e)}")
+            return None
+
+    def getSprintsByProject(self, idProyecto: int):
+        try:
+            sprints = self.session.query(ProyectoSprint.idProySprint, ProyectoSprint.NroSprint, ProyectoSprint.Fecha_Inicio, ProyectoSprint.Fecha_Fin, ProyectoSprint.Abierto).filter(ProyectoSprint.idProyecto == idProyecto).all()
+            if sprints:
+                return [{"idProySprint": s[0], "NroSprint": s[1], "Fecha_Inicio": s[2].isoformat(), "Fecha_Fin": s[3].isoformat(), "Abierto": s[4]} for s in sprints]
+            else:
+                return None
+        except Exception as e:
+            print(f"Error al obtener los sprints del proyecto: {str(e)}")
+            return None
+
     def updateEstado(self, idTarea: int, idEstado: int):
         try:
             tarea = self.session.query(Tarea).filter(Tarea.idTarea == idTarea).first()
@@ -250,3 +277,18 @@ class Querys():
             self.session.rollback()
             print(f"Error al asignar el responsable: {str(e)}")
             return {"value": "Error al asignar el responsable"}
+
+    def assignSprint(self, idTarea: int, idSprint: int):
+        try:
+            tarea = self.session.query(Tarea).filter(Tarea.idTarea == idTarea).first()
+            if not tarea:
+                return {"value": "Tarea no encontrada"}
+
+            tarea.idSprint = idSprint
+            self.session.commit()
+
+            return {"value": "Sprint asignado exitosamente"}
+        except Exception as e:
+            self.session.rollback()
+            print(f"Error al asignar el sprint: {str(e)}")
+            return {"value": "Error al asignar el sprint"}

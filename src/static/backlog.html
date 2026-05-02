@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdShira - Backlog</title>
+    <link rel="stylesheet" href="/static/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-container">
+                    <h2 class="full-logo">EdShira</h2>
+                    <h2 class="mini-logo">ES</h2>
+                </div>
+                <span class="collapse-icon" id="toggle-sidebar">❮</span>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" title="Backlog">
+                    <span class="nav-icon">📚</span>
+                    <span class="nav-text">Backlog</span>
+                </button>
+                <button class="nav-btn" title="Sprint Actual" onclick="window.location.href='/edshira'">
+                    <span class="nav-icon">🎯</span>
+                    <span class="nav-text">Sprint Actual</span>
+                </button>
+                <button class="nav-btn" title="Test Plan">
+                    <span class="nav-icon">🛠️</span>
+                    <span class="nav-text">Test Plan</span>
+                </button>
+                <button class="nav-btn" title="Test Lab">
+                    <span class="nav-icon">🔬</span>
+                    <span class="nav-text">Test Lab</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="nav-btn" title="Configuración">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Configuración</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="global-navbar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Buscar en backlog..." class="search-input">
+                </div>
+                
+                <div class="navbar-actions">
+                    <button class="btn-create">+ Crear historia</button>
+                    <div class="user-profile">
+                        <div class="user-avatar" id="nav-avatar">S</div>
+                        <span class="user-name" id="nav-username">Cargando...</span>
+                    </div>
+                </div>
+            </header>
+
+            <header class="top-header">
+                <h1 id="project-title-display">Proyecto Activo</h1>
+            </header>
+
+            <section class="sprint-header">
+                <h2>Backlog</h2>
+                <button class="btn-secondary">Crear sprint</button>
+            </section>
+
+            <div class="backlog-container" id="backlog-list">
+                <div class="loading-text">Cargando tareas...</div>
+            </div>
+
+        </main>
+    </div>
+    
+    <script src="/static/js/backlog.js"></script>
+</body>
+</html>
