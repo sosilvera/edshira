@@ -89,10 +89,8 @@ async def get_tarea(idTarea: int, db: Session = Depends(get_db)):
 @router.post("/actualizar_estado")
 async def actualizar_estado(payload: UpdateEstadoRequest, db: Session = Depends(get_db)):
     q = Querys(db)
-    estado = q.getEstadoByName(payload.estado)
-    if not estado:
-        raise HTTPException(status_code=404, detail="Estado no encontrado")
-    result = q.updateEstado(payload.idTarea, estado)
+
+    result = q.updateEstado(payload.idTarea, payload.idEstado)
 
     return result
 

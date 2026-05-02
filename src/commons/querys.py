@@ -80,9 +80,9 @@ class Querys():
             if not sprint:
                 return {"value": None}
             
-            tareas = self.session.query(Tarea.idTarea, Tarea.Codigo, TipoTarea.Nombre, EstadoTarea.Nombre).join(TipoTarea, TipoTarea.idTipo == Tarea.idTipo).join(EstadoTarea, EstadoTarea.idEstado == Tarea.idEstadoTarea).filter(Tarea.idSprint == sprint.idProySprint).all()
+            tareas = self.session.query(Tarea.idTarea, Tarea.Codigo, TipoTarea.Nombre, EstadoTarea.Nombre, Tarea.Descripcion).join(TipoTarea, TipoTarea.idTipo == Tarea.idTipo).join(EstadoTarea, EstadoTarea.idEstado == Tarea.idEstadoTarea).filter(Tarea.idSprint == sprint.idProySprint).all()
             
-            tareas_list = [{"idTarea": t[0], "codigo": t[1], "tipo": t[2], "estado": t[3]} for t in tareas]
+            tareas_list = [{"idTarea": t[0], "codigo": t[1], "tipo": t[2], "estado": t[3], "descripcion": t[4]} for t in tareas]
             
             return {
                 "value": {

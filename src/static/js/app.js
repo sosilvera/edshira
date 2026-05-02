@@ -189,17 +189,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderizarTarjeta(tarea) {
         // A. Diccionario para mapear el estado de la BD con el HTML
         const mapaEstados = {
-            "To Do": "todo",
-            "In Progress": "inprogress",
-            "Testing": "testing",
-            "Done": "done"
+            "To Do": ["todo", 1],
+            "In Progress": ["inprogress", 2],
+            "Testing": ["testing", 3],
+            "Done": ["done", 4]
         };
         
         // Si el estado viene raro, lo mandamos a To Do por defecto
         const columnaStatus = mapaEstados[tarea.estado] || "todo"; 
 
         // B. Seleccionamos el contenedor de la columna correcta
-        const contenedor = document.querySelector(`.kanban-column[data-status="${columnaStatus}"] .kanban-cards`);
+        const contenedor = document.querySelector(`.kanban-column[data-status="${columnaStatus[0]}"] .kanban-cards`);
         if (!contenedor) return;
 
         // C. Definimos el color según el tipo
@@ -211,11 +211,11 @@ document.addEventListener('DOMContentLoaded', () => {
         card.setAttribute('draggable', 'true');
         card.id = tarea.idTarea; // Usamos el idTarea como ID del elemento HTML
 
-        // Armamos el interior (Podés sumar titulo y descripción si la API lo envía luego)
+        // Armamos el interior (Podés sumar titulo y descripción si la API lo envío luego)
         card.innerHTML = `
             <div class="card-content">
                 <h4 class="task-title">${tarea.tipo} ${tarea.codigo}</h4>
-                <p class="task-desc">Sin descripción provista por la API.</p>
+                <p class="task-desc" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${tarea.descripcion}</p>
             </div>
             <div class="card-footer">
                 <span class="task-code">${tarea.codigo}</span>
@@ -232,11 +232,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const parentColumn = card.closest('.kanban-column');
             if (parentColumn) {
                 const nuevoEstado = parentColumn.getAttribute('data-status');
+                
+                for (const [key, value] of Object.entries(mapaEstados)) {
+                    if (value[0] === nuevoEstado) {
+                        idEstado = value[1];
+                        break;
+                    }
+                }
                 console.log(`La tarea ${card.id} cambió a: ${nuevoEstado}`);
                 fetch(`${API_URL}/actualizar_estado`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ idTarea: card.id, estado: nuevoEstado })
+                    body: JSON.stringify({ idTarea: card.id, idEstado: idEstado })
                 });
                 
                 // Acá podrías hacer el fetch para actualizar el estado en tu base de datos
