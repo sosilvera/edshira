@@ -14,6 +14,7 @@ class CreateTaskRequest(BaseModel):
     titulo: str
     descripcion: str
     idTipo: int
+    toSprint: bool
     idSprint: Optional[int] = None
     idUsuario: int
     idProyecto: int

@@ -58,14 +58,13 @@ async def crear_sprint(payload: CreateSprintRequest, db: Session = Depends(get_d
 @router.post("/crear_tarea")
 async def crear_tarea(payload: CreateTaskRequest, db: Session = Depends(get_db)):
     q = Querys(db)
-    if payload.idSprint:
-        # Devuelve todo el sprint
-        sprint = q.getSprintById(payload.idSprint)
-        if not sprint:
-            raise HTTPException(status_code=404, detail="Sprint no encontrado")
-        if sprint.idProyecto != payload.idProyecto: # Compara el idProyecto del sprint con el idProyecto de la tarea
-            raise HTTPException(status_code=400, detail="El idProyecto debe ser el mismo que el del sprint")
-            
+    if payload.toSprint:
+        idSprint = q.getIDSprintActivo(payload.idProyecto)
+        payload.idSprint = idSprint
+        if not idSprint:
+            raise HTTPException(status_code=400, detail="No hay un sprint activo en este proyecto para asignar la tarea")
+    
+    print("Payload recibido en API:", payload)
     result = q.createTarea(payload)
 
     return result

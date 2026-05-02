@@ -278,6 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const type = document.getElementById('create-type').value;
         const title = document.getElementById('create-title').value;
         const desc = document.getElementById('create-desc').value;
+        const addToSprint = document.getElementById('create-in-sprint').checked;
         
         console.log("Nueva Tarea a enviar a API:", { type, title, desc });
         
@@ -294,7 +295,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 "descripcion": desc,
                 "idTipo": MAP_TYPES[type],
                 "idUsuario": idUser,
-                "idProyecto": idProject
+                "idProyecto": idProject,
+                "toSprint": addToSprint
             })
         });
 

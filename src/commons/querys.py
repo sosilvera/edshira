@@ -41,6 +41,14 @@ class Querys():
             print(f"Error al obtener los proyectos: {str(e)}")
             return []
 
+    def getIDSprintActivo(self, idProject: int):
+        try:
+            sprint = self.session.query(ProyectoSprint.idProySprint).filter(ProyectoSprint.idProyecto == idProject, ProyectoSprint.Abierto == True).first()
+            return sprint[0] if sprint else None
+        except Exception as e:
+            print(f"Error al obtener el ID del sprint activo: {str(e)}")
+            return None
+
     def assignProject(self, idUsuario: int, idProyecto: int):
         try:
             # Verificar si el proyecto existe

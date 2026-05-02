@@ -353,3 +353,22 @@ body {
     padding: 40px;
     font-size: 1rem;
 }
+
+/* --- Estilos para el Checkbox del Modal --- */
+.checkbox-group {
+    margin-top: 8px;
+    margin-bottom: 20px;
+}
+
+.checkbox-label {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    user-select: none; /* Evita que el texto se seleccione al hacer clic rápido */
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #3b82f6; /* Pinta el checkbox del color azul primario cuando se marca */
+    cursor: pointer;
+}
