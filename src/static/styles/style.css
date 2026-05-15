@@ -230,17 +230,139 @@ body {
 .error-text { color: #ef4444; font-size: 0.85rem; margin-top: 6px; }
 
 /* Grid para Visualizar Historia */
-.view-grid { display: flex; gap: 24px; }
-.view-main { flex: 2; }
-.view-sidebar { flex: 1; background: #0f172a; padding: 16px; border-radius: 8px; border: 1px solid #334155; }
-.view-box {
-    background: #0f172a; border: 1px solid #334155; border-radius: 8px;
-    padding: 16px; min-height: 100px; font-size: 0.95rem; line-height: 1.5; color: #cbd5e1;
+.modal-stacked {
+    max-width: 680px;
+    width: 100%;
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
 }
-.view-detail { margin-bottom: 12px; font-size: 0.9rem; display: flex; flex-direction: column; gap: 4px; }
-.view-detail strong { color: #94a3b8; }
-.view-detail span { color: #f1f5f9; font-weight: 500; }
-.view-header-title { display: flex; align-items: center; gap: 12px; }
+
+/* Cabecera del título */
+.modal-header-stacked {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+}
+
+.title-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-grow: 1;
+    padding-right: 20px;
+}
+
+.title-container h2 {
+    font-size: 1.6rem; /* Título bien grande */
+    color: #f8fafc;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.task-code-badge {
+    background-color: #3b82f6;
+    color: #ffffff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-family: monospace;
+    font-weight: 600;
+    width: fit-content;
+}
+
+/* Cuerpo de filas */
+.modal-body-stacked {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Espaciado limpio entre bloques horizontales */
+}
+
+.meta-row {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+/* Columnas dobles (uno al lado del otro) */
+.double-col .meta-field {
+    flex: 1;
+    background-color: #0f172a; /* Fondo más oscuro para encapsular el dato */
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 70px;
+    justify-content: center;
+}
+
+/* Columna única (para la descripción al final) */
+.single-col .meta-field {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Etiquetas y Valores */
+.meta-field strong {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #94a3b8; /* Gris claro accesible */
+    font-weight: 600;
+}
+
+.meta-field span {
+    font-size: 1rem;
+    color: #f1f5f9;
+    font-weight: 500;
+}
+
+.section-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+/* Selector del Responsable alineado */
+.view-select {
+    background-color: transparent;
+    border: none;
+    color: #f1f5f9;
+    font-size: 1rem;
+    font-weight: 500;
+    outline: none;
+    width: 100%;
+    cursor: pointer;
+    padding: 0;
+}
+
+.view-select option {
+    background-color: #0f172a;
+    color: #f1f5f9;
+}
+
+/* Caja de Descripción final */
+.view-box {
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 16px;
+    min-height: 140px;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+}
 
 /* ========================================== */
 /* ESTILOS ESPECÍFICOS DE LA VISTA BACKLOG    */

@@ -4,6 +4,9 @@ const MAP_TYPES = {
     "HU": 2
 };
 
+// Caché en memoria para la lista de usuarios
+let listaUsuariosGlobal = [];
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- VARIABLES GLOBALES DEL DOM ---
@@ -337,7 +340,37 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('view-sprint').textContent = data.nroSprint || 'Backlog';
             document.getElementById('view-project').textContent = data.nombre_proyecto;
             document.getElementById('view-creator').textContent = data.creador;
-            document.getElementById('view-owner').textContent = data.responsable;
+
+            // --- NUEVA LÓGICA: CARGAR RESPONSABLES ---
+            const ownerSelect = document.getElementById('view-owner-select');
+            ownerSelect.innerHTML = '<option value="">Sin asignar</option>';
+            ownerSelect.dataset.taskId = taskId; // Guardamos el ID de la tarea en el select
+            
+            // Si la lista de usuarios está vacía, llamamos a la API
+            if (listaUsuariosGlobal.length === 0) {
+                try {
+                    const resUsers = await fetch(`${API_URL}/get_usuarios`);
+                    if (resUsers.ok) {
+                        listaUsuariosGlobal = await resUsers.json(); 
+                    }
+                } catch (error) {
+                    console.error("Error obteniendo la lista de usuarios:", error);
+                }
+            }
+
+            // Llenar el select con los usuarios
+            listaUsuariosGlobal.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.id; // Asumiendo que tu BD devuelve "id"
+                opt.textContent = u.nombre; // Asumiendo que devuelve "nombre"
+                
+                // Si el nombre del responsable coincide, lo dejamos seleccionado por defecto
+                // (Si tu API devuelve el ID del responsable, es mejor comparar por ID)
+                if (u.nombre === data.responsable) {
+                    opt.selected = true;
+                }
+                ownerSelect.appendChild(opt);
+            });
 
         } catch (error) {
             console.error("Error al cargar la tarea:", error);
@@ -345,7 +378,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Guardar nuevo responsable ---
+    document.getElementById('view-owner-select').addEventListener('change', async (e) => {
+        const taskId = e.target.dataset.taskId;
+        const newOwnerId = e.target.value; // Será vacío si eligieron "Sin asignar"
 
+        try {
+            // Deshabilitar temporalmente para evitar múltiples clics
+            e.target.disabled = true;
+
+            // Llamada POST a tu API
+            await fetch(`${API_URL}/asignar_responsable`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    idTarea: parseInt(taskId),
+                    idUsuario: newOwnerId ? parseInt(newOwnerId) : null
+                })
+            });
+
+            console.log(`[API CALL] Tarea ${taskId} asignada al usuario ${newOwnerId || 'Ninguno'}`);
+            
+            // Volver a habilitar
+            e.target.disabled = false;
+            
+        } catch (error) {
+            console.error("Error al asignar responsable:", error);
+            alert("No se pudo asignar el responsable. Verificá la conexión.");
+            e.target.disabled = false;
+        }
+    });
     // ==========================================
     // INTERFAZ GENERAL Y DRAG & DROP
     // ==========================================

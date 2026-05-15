@@ -4,12 +4,14 @@
     - Traer proyectos de un usuario: /proyectosUsuario/{idUsuario} [LISTO]
     - Asignar usuario a un proyecto: /asignar_proyecto [LISTO]
     - Listar proyectos: /get_proyectos [LISTO]
-    - Crear proyecto: /crear_proyecto 
+    - Crear proyecto: /crear_proyecto [PENDIENTE]
 - Sprint
-    - Crear sprint
-    - Cerrar sprint
-    - Listar sprints pasados
+    - Crear sprint [PENDIENTE]
+    - Cerrar sprint [PENDIENTE]
+    - Listar sprints pasados [PENDIENTE]
     - Gestionar backlog
+        - Listar backlog [LISTO]
+        - Asignar tareas a sprints [PENDIENTE]
 - Tareas
     - Crear tarea [LISTO]
         - Tipos de tarea: Epica, Historia de Usuario, Defecto
@@ -17,8 +19,8 @@
         - Creador
         - Sprint actual (no obligatorio)
         - Epica (no obligatorio)
-    - Visualizar tarea
-    - Modificar tareas
+    - Visualizar tarea [EN_PROCESO]
+    - Modificar tareas [PENDIENTE]
 
 ### Sprint
 
