@@ -28,42 +28,47 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // LÓGICA DE INICIALIZACIÓN
     // ==========================================
+
     async function runInitFlow() {
         let userId = localStorage.getItem('userId');
         let userName = localStorage.getItem('userName');
         let projectId = localStorage.getItem('projectId');
         let projectCode = localStorage.getItem('projectCode');
 
-        // 1. Revisar si hay usuario logueado
+        // ESTADO 1: No hay usuario -> Mostrar Login y detener ejecución
         if (!userId) {
             initModal.style.display = 'flex';
             loginSection.style.display = 'block';
             projectSection.style.display = 'none';
-            return; // Espera a que el usuario complete el login
+            return; 
         }
 
-        // Mostrar usuario en nav
+        // Mostrar usuario en nav superior
         navUsername.textContent = userName;
         navAvatar.textContent = userName.charAt(0).toUpperCase();
 
-        // 2. Validar si tiene proyecto asignado
+        // ESTADO 2: Hay usuario, pero no hay proyecto válido asignado
         if (!projectId || isNaN(Number(projectId))) {
+            // Limpiamos basura en caché por las dudas
             localStorage.removeItem('projectId');
             localStorage.removeItem('projectCode');
             projectId = null;
+            
             try {
+                // ÚNICA llamada para consultar los proyectos del usuario
                 const res = await fetch(`${API_URL}/proyectos_usuario/${userId}`);
                 const proyectosArray = await res.json();
 
                 if (proyectosArray && proyectosArray.length > 0) {
-                    // Elegir el primero y guardar en caché
+                    // Tiene proyectos: Elegimos el primero y guardamos en caché
                     projectId = proyectosArray[0].idProyecto;
+                    projectCode = proyectosArray[0].codigo;
                     localStorage.setItem('projectId', projectId);
-                    localStorage.setItem('projectCode', proyectosArray[0].codigo);
+                    localStorage.setItem('projectCode', projectCode);
                 } else {
-                    // Mostrar listado de proyectos a suscribir
+                    // No tiene proyectos: Mostrar listado para suscribir y detener ejecución
                     await loadProjectsForSubscription(userId);
-                    return; // Espera a que el usuario se suscriba
+                    return; 
                 }
             } catch (error) {
                 console.error("Error al validar proyectos del usuario:", error);
@@ -71,7 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 3. Llamar API Sprint Activo
+        // ESTADO 3: Todo en orden (Hay usuario y proyecto) -> Cargar el tablero
+        initModal.style.display = 'none'; // Ocultamos el modal definitivamente
         fetchSprintActivo(projectId);
     }
 
@@ -84,44 +90,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            document.getElementById('btn-login').disabled = true;
+            const btnLogin = document.getElementById('btn-login');
+            btnLogin.disabled = true;
+            btnLogin.textContent = "Cargando...";
             let currentUserId;
 
-            // Llamar a /get_usuario
+            // 1. Obtener o crear usuario
             const getRes = await fetch(`${API_URL}/get_user_id/${username}`);
             if (getRes.ok) {
                 const userData = await getRes.json();
                 currentUserId = userData.id;
             } else {
-                // Crear usuario si no existe
                 const createRes = await fetch(`${API_URL}/crear_usuario`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ nombre: username })
                 });
                 const newUserData = await createRes.json();
-                currentUserId = newUserData.idUsuario;
+                currentUserId = newUserData.idUsuario; // Asegurate de que tu API devuelva idUsuario acá
             }
 
-            // Guardar en cache
+            // 2. Guardar en caché
             localStorage.setItem('userId', currentUserId);
             localStorage.setItem('userName', username);
 
-            // Llamar a /proyectosUsuario
-            const projRes = await fetch(`${API_URL}/proyectos_usuario/${currentUserId}`);
-            const projArray = await projRes.json();
-
-            if (projArray && projArray.length > 0) {
-                localStorage.setItem('projectId', projArray[0].idProyecto);
-                localStorage.setItem('projectCode', projArray[0].codigo);
-            }
+            // 3. Restaurar botón y AVANZAR AL SIGUIENTE ESTADO (sin recargar la página)
+            btnLogin.disabled = false;
+            btnLogin.textContent = "Ingresar";
             
-            // Recargar página
-            window.location.reload();
+            await runInitFlow(); // Llama a la función principal para que evalúe los proyectos
 
         } catch (error) {
             console.error("Error en login:", error);
-            document.getElementById('btn-login').disabled = false;
+            const btnLogin = document.getElementById('btn-login');
+            btnLogin.disabled = false;
+            btnLogin.textContent = "Ingresar";
+            document.getElementById('login-error').textContent = "Error de conexión.";
+            document.getElementById('login-error').style.display = 'block';
         }
     });
 
@@ -140,6 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             proyectos.forEach(p => {
                 const opt = document.createElement('option');
                 opt.value = p.idProyecto;
+                opt.dataset.codigo = p.codigo || ''; // Guardamos el código temporalmente en el option
                 opt.textContent = p.nombre;
                 select.appendChild(opt);
             });
@@ -150,21 +156,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('btn-subscribe').onclick = async () => {
             const selectedProjId = select.value;
+            const selectedOption = select.options[select.selectedIndex];
+            const selectedCode = selectedOption.dataset.codigo;
+
             if (!selectedProjId) return;
 
             try {
-                document.getElementById('btn-subscribe').disabled = true;
+                const btnSub = document.getElementById('btn-subscribe');
+                btnSub.disabled = true;
+                btnSub.textContent = "Asignando...";
+
+                // 1. Asignar en la BD
                 await fetch(`${API_URL}/asignar_proyecto`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ idUsuario: parseInt(userId), idProyecto: parseInt(selectedProjId) })
                 });
                 
+                // 2. Guardar el nuevo proyecto en caché
                 localStorage.setItem('projectId', selectedProjId);
-                window.location.reload();
+                if (selectedCode) localStorage.setItem('projectCode', selectedCode);
+                
+                // 3. Restaurar botón y AVANZAR (sin recargar)
+                btnSub.disabled = false;
+                btnSub.textContent = "Suscribirse";
+                
+                await runInitFlow(); // Carga el sprint automáticamente!
+                
             } catch (error) {
                 console.error("Error asignando proyecto:", error);
                 document.getElementById('btn-subscribe').disabled = false;
+                document.getElementById('btn-subscribe').textContent = "Suscribirse";
             }
         };
     }
