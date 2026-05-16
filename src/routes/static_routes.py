@@ -11,3 +11,7 @@ async def read_root():
 @router.get("/backlog")
 async def read_backlog():
     return FileResponse("static/backlog.html")
+
+@router.get("/testing")
+async def read_testing():
+    return FileResponse("static/testing.html")
