@@ -5,16 +5,6 @@ from datetime import datetime
 
 class Querys():
     def __init__(self, db: SessionLocal):
-        # Ruta relativa o absoluta de la base de datos SQLite3
-        # ruta_db = "nombre.db"
-
-        # Crear la conexión a la base de datos SQLite3
-        #engine = create_engine(f"sqlite:///{ruta_db}")
-        #Base.metadata.create_all(engine)
-        #Session = sessionmaker(bind=engine)
-
-        #self.session = Session()
-
         self.session = db
 
     def getUserByName(self, nombreUsuario: str):

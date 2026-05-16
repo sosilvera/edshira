@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from commons.querys import Querys
-from schema.database import get_db
+from core.database import get_db
 from models.models import CreateSprintRequest, CreateTaskRequest, UpdateEstadoRequest, AssignResponsibleRequest, AssignProjectRequest, AssignSprintRequest, CreateUsuarioRequest
 
 router = APIRouter(prefix="/edshira/api/projects")

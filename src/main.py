@@ -1,5 +1,6 @@
 import os
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from routes.admin_routes import router as admin_routes
@@ -7,8 +8,9 @@ from routes.projects_routes import router as projects_routes
 from routes.testing_routes import router as testing_routes
 from routes.static_routes import router as static_router
 from dotenv import load_dotenv
+from core.lifespan import app_lifespan as lifespan
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Configurar CORS para desarrollo
