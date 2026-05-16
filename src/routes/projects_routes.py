@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from commons.querys import Querys
 from schema.database import get_db
-from models.models import CreateSprintRequest, CreateTaskRequest, UpdateEstadoRequest, AssignResponsibleRequest, AssignProjectRequest, AssignSprintRequest
+from models.models import CreateSprintRequest, CreateTaskRequest, UpdateEstadoRequest, AssignResponsibleRequest, AssignProjectRequest, AssignSprintRequest, CreateUsuarioRequest
 
 router = APIRouter(prefix="/edshira/api/projects")
 
@@ -129,4 +129,18 @@ async def asignar_responsable(payload: AssignResponsibleRequest, db: Session = D
     q = Querys(db)
     result = q.assignResponsable(payload.idTarea, payload.idResponsable)
 
+    return result
+
+@router.get("/get_usuarios")
+async def get_usuarios(db: Session = Depends(get_db)):
+    q = Querys(db)
+    usuarios = q.getUsuarios()
+    if usuarios is None:
+        raise HTTPException(status_code=404, detail="Usuarios no encontrados")
+    return usuarios
+
+@router.post("/crear_usuario")
+async def crear_usuario(payload: CreateUsuarioRequest, db: Session = Depends(get_db)):
+    q = Querys(db)
+    result = q.createUsuario(payload.nombre)
     return result

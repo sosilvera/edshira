@@ -36,3 +36,6 @@ class AssignProjectRequest(BaseModel):
 class AssignSprintRequest(BaseModel):
     idTarea: int
     idSprint: int
+
+class CreateUsuarioRequest(BaseModel):
+    nombre: str

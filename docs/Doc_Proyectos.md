@@ -19,7 +19,7 @@
         - Creador
         - Sprint actual (no obligatorio)
         - Epica (no obligatorio)
-    - Visualizar tarea [EN_PROCESO]
+    - Visualizar tarea [LISTO]
     - Modificar tareas [PENDIENTE]
 
 ### Sprint
@@ -94,6 +94,9 @@ POST /asignar_responsable [LISTO]
 POST /actualizar_estado [LISTO]
     - Viene idEstado e idTarea en el body, lo actualiza en la tabla
 
+GET /get_usuarios [LISTO]
+    - Devuelve una lista de {"id", "nombre"}
+
 ### Flujo Web
 Cuando carga la página:
 
@@ -116,3 +119,12 @@ Cuando carga la página:
 		- Con el idProyecto, llamar la api POST /asignar_proyecto con el idUsuario e idProyecto
 
 - Llamar API /sprintActivo/{idProject} con el idProject que tiene el usuario en la cache
+
+## TO DO
+
+- Cambiar funcion de crear usuario, agregar contraseña y roles. Ahora esta hardcodeado
+
+
+## Bug
+
+- Revisar el flujo de login, la funcion runInitFlow valida si el usuario esta logueado, pero si no esta logueado, igualmente obtiene los proyectos de UNDEFINED

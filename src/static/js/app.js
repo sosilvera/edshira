@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // LÓGICA DE INICIALIZACIÓN
     // ==========================================
     async function runInitFlow() {
-        const userId = localStorage.getItem('userId');
-        const userName = localStorage.getItem('userName');
+        let userId = localStorage.getItem('userId');
+        let userName = localStorage.getItem('userName');
         let projectId = localStorage.getItem('projectId');
         let projectCode = localStorage.getItem('projectCode');
 
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ nombre: username })
                 });
                 const newUserData = await createRes.json();
-                currentUserId = newUserData.id;
+                currentUserId = newUserData.idUsuario;
             }
 
             // Guardar en cache
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('userName', username);
 
             // Llamar a /proyectosUsuario
-            const projRes = await fetch(`${API_URL}/proyectosUsuario/${currentUserId}`);
+            const projRes = await fetch(`${API_URL}/proyectos_usuario/${currentUserId}`);
             const projArray = await projRes.json();
 
             if (projArray && projArray.length > 0) {
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
             select.innerHTML = '<option value="">Seleccioná un proyecto...</option>';
             proyectos.forEach(p => {
                 const opt = document.createElement('option');
-                opt.value = p.id;
+                opt.value = p.idProyecto;
                 opt.textContent = p.nombre;
                 select.appendChild(opt);
             });
@@ -361,12 +361,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Llenar el select con los usuarios
             listaUsuariosGlobal.forEach(u => {
                 const opt = document.createElement('option');
-                opt.value = u.id; // Asumiendo que tu BD devuelve "id"
-                opt.textContent = u.nombre; // Asumiendo que devuelve "nombre"
+                opt.value = u.idUsuario; // Asumiendo que tu BD devuelve "id"
+                opt.textContent = u.Nombre; // Asumiendo que devuelve "nombre"
                 
                 // Si el nombre del responsable coincide, lo dejamos seleccionado por defecto
                 // (Si tu API devuelve el ID del responsable, es mejor comparar por ID)
-                if (u.nombre === data.responsable) {
+                if (u.Nombre === data.responsable) {
                     opt.selected = true;
                 }
                 ownerSelect.appendChild(opt);
@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     idTarea: parseInt(taskId),
-                    idUsuario: newOwnerId ? parseInt(newOwnerId) : null
+                    idResponsable: newOwnerId ? parseInt(newOwnerId) : null
                 })
             });
 

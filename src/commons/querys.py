@@ -300,3 +300,32 @@ class Querys():
             self.session.rollback()
             print(f"Error al asignar el sprint: {str(e)}")
             return {"value": "Error al asignar el sprint"}
+
+    def getUsuarios(self):
+        try:
+            usuarios = self.session.query(Usuario.idUsuario, Usuario.Nombre).all()
+            if usuarios:
+                return [{"idUsuario": u[0], "Nombre": u[1]} for u in usuarios]
+            else:
+                return None
+        except Exception as e:
+            print(f"Error al obtener los usuarios: {str(e)}")
+            return None
+
+    def createUsuario(self, nombre: str):
+        try:
+            idUser = self.getUserByName(nombre)
+            if idUser is None:
+                nuevo_usuario = Usuario(Nombre=nombre, Pass="defaultpassword", idRol=1)  # Asignar un rol por defecto, por ejemplo, 1 para "Usuario"
+                self.session.add(nuevo_usuario)
+                self.session.commit()
+                new_user = nuevo_usuario.idUsuario
+            
+            if idUser is not None:
+                return {"idUsuario": idUser["id"]}
+
+            return {"idUsuario": new_user}
+        except Exception as e:
+            self.session.rollback()
+            print(f"Error al crear el usuario: {str(e)}")
+            return {"value": None}
