@@ -39,3 +39,8 @@ class AssignSprintRequest(BaseModel):
 
 class CreateUsuarioRequest(BaseModel):
     nombre: str
+
+class Carpeta(BaseModel):
+    Nombre: str
+    Padre: str
+    Origen: str

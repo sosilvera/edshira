@@ -19,6 +19,12 @@ CREATE TABLE Estado_Tarea (
     Nombre VARCHAR(50) NOT NULL
 );
 
+CREATE TABLE Carpeta (
+    idCarpeta INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre VARCHAR(255) NOT NULL,
+    Origen VARCHAR(255) NOT NULL
+);
+
 -- 2. Tablas de Nivel 1 (Dependen de Usuarios)
 CREATE TABLE Proyecto (
     idProyecto INT AUTO_INCREMENT PRIMARY KEY,
@@ -108,4 +114,20 @@ CREATE TABLE Defectos_Test (
     idTarea INT NOT NULL,
     FOREIGN KEY (idTest) REFERENCES Tests(idTest) ON DELETE CASCADE,
     FOREIGN KEY (idTarea) REFERENCES Tareas(idTarea) ON DELETE CASCADE
+);
+
+CREATE TABLE Carpeta_TestPlan (
+    idCarpetaTarea INT AUTO_INCREMENT PRIMARY KEY,
+    idCarpeta INT NOT NULL,
+    idTestPlan INT NOT NULL,
+    FOREIGN KEY (idCarpeta) REFERENCES Carpeta(idCarpeta) ON DELETE CASCADE,
+    FOREIGN KEY (idTestPlan) REFERENCES Test_Plans(idTestPlan) ON DELETE CASCADE
+);
+
+CREATE TABLE Carpeta_TestExecution (
+    idCarpetaTarea INT AUTO_INCREMENT PRIMARY KEY,
+    idCarpeta INT NOT NULL,
+    idTestCycle INT NOT NULL,
+    FOREIGN KEY (idCarpeta) REFERENCES Carpeta(idCarpeta) ON DELETE CASCADE,
+    FOREIGN KEY (idTestCycle) REFERENCES Test_Cycle(idTestCycle) ON DELETE CASCADE
 );

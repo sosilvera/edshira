@@ -24,6 +24,13 @@ class EstadoTarea(Base):
     idEstado = Column(Integer, primary_key=True, autoincrement=True)
     Nombre = Column(String(50), nullable=False)
 
+class Carpeta(Base):
+    __tablename__ = 'Carpeta'
+    
+    idCarpeta = Column(Integer, primary_key=True, autoincrement=True)
+    Nombre = Column(String(255), nullable=False)
+    Origen = Column(String(255), nullable=False)
+
 # 2. Tablas de Nivel 1 (Dependen de Usuarios)
 class Proyecto(Base):
     __tablename__ = 'Proyecto'
@@ -130,3 +137,24 @@ class DefectoTest(Base):
     idDefectoTest = Column(Integer, primary_key=True, autoincrement=True)
     idTest = Column(Integer, ForeignKey('Tests.idTest', ondelete='CASCADE'), nullable=False)
     idTarea = Column(Integer, ForeignKey('Tareas.idTarea', ondelete='CASCADE'), nullable=False)
+
+
+class CarpetaTestPlan(Base):
+    __tablename__ = 'Carpeta_TestPlan'
+    
+    idCarpetaTarea = Column(Integer, primary_key=True, autoincrement=True)
+    idCarpeta = Column(Integer, ForeignKey('Carpeta.idCarpeta', ondelete='CASCADE'), nullable=False)
+    idTestPlan = Column(Integer, ForeignKey('Test_Plans.idTestPlan', ondelete='CASCADE'), nullable=False)
+    
+    carpeta = relationship("Carpeta")
+    test_plan = relationship("TestPlan")
+
+class CarpetaTestExecution(Base):
+    __tablename__ = 'Carpeta_TestExecution'
+    
+    idCarpetaTarea = Column(Integer, primary_key=True, autoincrement=True)
+    idCarpeta = Column(Integer, ForeignKey('Carpeta.idCarpeta', ondelete='CASCADE'), nullable=False)
+    idTestCycle = Column(Integer, ForeignKey('Test_Cycle.idTestCycle', ondelete='CASCADE'), nullable=False)
+    
+    carpeta = relationship("Carpeta")
+    test_cycle = relationship("TestCycle")
