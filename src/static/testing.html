@@ -70,73 +70,48 @@
             </div>
 
             <div id="test-plan-view" class="testing-layout">
+                
+                <!-- Panel Izquierdo: Árbol de Carpetas -->
                 <div class="testing-sidebar">
                     <h3 class="testing-sidebar-title">Carpetas</h3>
-                    <ul class="tree-list">
-                        <li class="tree-node">
-                            <span class="tree-toggle">▶</span> App Tuenti
-                        </li>
-                        <li class="tree-node">
-                            <span class="tree-toggle">▶</span> App Movistar
-                        </li>
-                        <li class="tree-node expanded">
-                            <span class="tree-toggle">▼</span> App NewOM
-                            <ul class="tree-sublist">
-                                <li class="tree-leaf">Funcionalidad Login</li>
-                                <li class="tree-leaf active">Crear Orden</li>
-                            </ul>
-                        </li>
+                    <!-- CONTENEDOR DINÁMICO DE CARPETAS -->
+                    <ul class="tree-list" id="folder-tree-container">
+                        <li class="tree-leaf loading-text">Cargando carpetas...</li>
                     </ul>
                 </div>
 
+                <!-- Panel Derecho: Lista de Casos y Detalles -->
                 <div class="testing-main">
                     
+                    <!-- Grilla de Casos -->
                     <div class="cases-panel">
                         <div class="cases-header">
-                            <h3>Crear Orden</h3>
+                            <!-- TÍTULO DINÁMICO -->
+                            <h3 id="cases-section-title">Seleccioná una carpeta</h3>
                             <button class="btn-create-sm">+ Crear Caso</button>
                         </div>
                         
-                        <div class="cases-list">
-                            <div class="case-row active" onclick="mostrarDetalleCaso(1)">
-                                <span class="case-icon">📄</span>
-                                <span class="case-title">Caso 1 - Crear orden - Producto USH</span>
-                                <div class="case-badges">
-                                    <span class="badge badge-approved">APROBADO</span>
-                                    <span class="badge badge-notrun">NOT RUN</span>
-                                </div>
-                            </div>
-                            <div class="case-row" onclick="mostrarDetalleCaso(2)">
-                                <span class="case-icon">📄</span>
-                                <span class="case-title">Caso 2 - Crear orden - Producto Moto</span>
-                                <div class="case-badges">
-                                    <span class="badge badge-draft">BORRADOR</span>
-                                    <span class="badge badge-pass">PASS</span>
-                                </div>
-                            </div>
-                            <div class="case-row" onclick="mostrarDetalleCaso(3)">
-                                <span class="case-icon">📄</span>
-                                <span class="case-title">Caso 3 - Crear orden - Productos Mixto</span>
-                                <div class="case-badges">
-                                    <span class="badge badge-approved">APROBADO</span>
-                                    <span class="badge badge-fail">FAILED</span>
-                                </div>
+                        <!-- CONTENEDOR DINÁMICO DE CASOS -->
+                        <div class="cases-list" id="cases-list-container">
+                            <div class="loading-text" style="padding: 20px;">
+                                Seleccioná una carpeta de Test Plan para ver sus casos.
                             </div>
                         </div>
                     </div>
 
+                    <!-- Panel de Detalles del Caso (Mantiene sus IDs originales) -->
                     <div class="case-details-panel">
                         <div class="detail-field">
-                            <strong>Título:</strong> <span id="detail-title">Caso 1 - Crear orden - Producto USH</span>
+                            <strong>Título:</strong> <span id="detail-title">-</span>
                         </div>
                         <div class="detail-field">
-                            <strong>Descripción:</strong> <span id="detail-desc">Ingresar orden con productos manufacturados en USH</span>
+                            <strong>Descripción:</strong> <span id="detail-desc">-</span>
                         </div>
                         <div class="detail-field">
-                            <strong>Precondiciones:</strong> <span id="detail-pre">Que haya stock de productos de USH</span>
+                            <strong>Precondiciones:</strong> <span id="detail-pre">-</span>
                         </div>
                         <div class="detail-field">
-                            <strong>Resultado esperado:</strong> <span id="detail-res">Que se visualice la orden pendiente de avanzar</span>
+                            <strong>Resultado esperado:</strong> <span id="detail-res">-</span>
                         </div>
                     </div>
 
