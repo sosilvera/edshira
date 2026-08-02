@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from commons.querys_testing import Querys
 from core.database import get_db
-from models.models import Carpeta, CarpetaTestPlan, TestPlan
+from models.models import Carpeta, CarpetaTestPlan, TestPlan, Test
 
 router = APIRouter(prefix="/edshira/api/testing")
 
@@ -44,6 +44,13 @@ async def set_carpeta(CarpetaTest: CarpetaTestPlan, db: Session = Depends(get_db
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al asignar carpeta al TestPlan: {str(e)}")
 
+@router.get("/get_carpetas")
+async def get_carpetas(db: Session = Depends(get_db)):
+    q = Querys(db)
+    carpetas = q.getCarpetas()
+    if not carpetas:
+        raise HTTPException(status_code=404, detail="Carpetas no encontradas")
+    return carpetas
 
 @router.post("/crear_testplan")
 async def crear_testplan(testplan: TestPlan, db: Session = Depends(get_db)):
@@ -53,3 +60,20 @@ async def crear_testplan(testplan: TestPlan, db: Session = Depends(get_db)):
         return {"id": nueva_testplan.idTestPlan}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear TestPlan: {str(e)}")
+
+@router.post("/crear_test")
+async def crear_test(test: Test, db: Session = Depends(get_db)):
+    try:
+        q = Querys(db)
+        nuevo_test = q.insertar_test(test.Nombre, test.Descripcion, test.idTestPlan, test.idUsuario)
+        return {"id": nuevo_test.idTest}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al crear Test: {str(e)}")
+
+@router.get("/get_execution_state/{idTest}")
+async def get_execution_state(idTest: int, db: Session = Depends(get_db)):
+    q = Querys(db)
+    estado = q.getEstadoEjecucion(idTest)
+    if not estado:
+        raise HTTPException(status_code=404, detail="Estado de ejecución no encontrado")
+    return estado

@@ -7,6 +7,13 @@
             - Padre: str - Nulleable - Default "Root"
             - Origen: str - "Plan" o "Execution"
     - Borrar carpetas
+    - Listar testplans por Carpeta
+        - /get_folders
+            - idCarpeta
+            - Origen
+            - idTestPlan
+            - NombreTestPlan
+
     - Crear testPlan [LISTO]
         - /crear_testplan -> idTestPlan
             - Nombre: str - Not Null
@@ -19,7 +26,7 @@
                 - idCarpeta
                 - idTestSet
 
-        - Crear casos dentro de testPlan -> idTest
+        - Crear casos dentro de testPlan -> idTest [LISTO]
             - /crear_test -> idTest
                 - Nombre: str - not null
                 - Descripcion: str - nulleable
@@ -27,11 +34,16 @@
                 - idUsuario: int - not null
                 - Estado: int - not null
             
-            - /get_estado_caso
-            - /get_estado_ejecucion
+            - /get_estado_caso -> APROBADO|BORRADOR [NO_MVP]
                 - idCaso
+                - Tengo que agregar columna a tabla de casos y tendria que agregar una forma de actualizarlo, no fue pensado desde el inicio. Lo dejo para mas adelante
+
+            - /get_estado_ejecucion -> Trae estado de ultima ejecucion: PASS|FAIL|NOT RUN|etc.. [LISTO]
+                - idCaso
+
             - /get_testplans [LISTO]
                 - idProyecto
+            
             - /get_cases_by_testplan [LISTO]
                 - idTestPlan
 
@@ -56,3 +68,7 @@ Descripcion:
                 |
                 V
     Case 1| Case 2 | Caso N
+
+
+Pendiente:
+- Ver como armar una tabla en cache que tenga los posibles estados validos de los casos, cosa de no tener que levantarlos de la BD cada vez que se quiere crear un caso

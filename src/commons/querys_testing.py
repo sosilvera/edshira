@@ -59,3 +59,50 @@ class Querys():
             self.session.rollback()
             print(f"Error al insertar TestPlan: {str(e)}")
             raise
+
+    def insertar_test(self, nombre: str, descripcion: str, idTestPlan: int, idUsuario: int):
+        try:
+            nuevo_test = Test(Nombre=nombre, Descripcion=descripcion, idTestPlan=idTestPlan, idUsuario=idUsuario)
+            self.session.add(nuevo_test)
+            self.session.commit()
+            self.session.refresh(nuevo_test)
+            return nuevo_test
+        except Exception as e:
+            self.session.rollback()
+            print(f"Error al insertar Test: {str(e)}")
+            raise
+
+    def getEstadoEjecucion(self, idTest: int):
+        try:
+            estado = self.session.query(TestExecution).filter(TestExecution.idTest == idTest).first()
+            return {"idTest": estado.idTest, "idTestCycle": estado.idTestCycle, "estado": estado.Estado, "fechaEjecucion": estado.FechaEjecucion} if estado else "Not Run"
+        except Exception as e:
+            print(f"Error al obtener el estado de ejecución del caso: {str(e)}")
+            return None
+
+    def getCarpetas(self):
+        try:
+            carpetas = self.session.query(Carpeta).all()
+            result = []
+
+            for c in carpetas:
+                test_plans = resultados = self.session.query(
+                    CarpetaTestPlan.idTestPlan,
+                    TestPlan.Nombre
+                ).join(
+                    TestPlan, TestPlan.idTestPlan == CarpetaTestPlan.idTestPlan
+                ).filter(
+                    CarpetaTestPlan.idCarpeta == c.idCarpeta
+                ).all()
+
+                result.append({
+                    "idCarpeta": c.idCarpeta,
+                    "Nombre": c.Nombre,
+                    "Origen": c.Origen,
+                    "TestPlans": [{"idTestPlan": tp.idTestPlan, "Nombre": tp.Nombre} for tp in test_plans] if test_plans else []
+                })
+            
+            return result if result else None
+        except Exception as e:
+            print(f"Error al obtener las carpetas: {str(e)}")
+            return None

@@ -54,3 +54,9 @@ class TestPlan(BaseModel):
     Descripcion: Optional[str] = None
     idProyecto: int
     idUsuario: int
+
+class Test(BaseModel):
+    Nombre: str
+    Descripcion: Optional[str] = None
+    idTestPlan: int
+    idUsuario: int

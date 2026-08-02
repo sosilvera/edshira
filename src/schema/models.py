@@ -130,6 +130,7 @@ class TestExecution(Base):
     
     idUsuario = Column(Integer, ForeignKey('Usuarios.idUsuario', ondelete='SET NULL'), nullable=True)
     Estado = Column(String(50), nullable=False)
+    FechaEjecucion = Column(Date, nullable=True)
 
 class DefectoTest(Base):
     __tablename__ = 'Defectos_Test'
