@@ -47,3 +47,15 @@ class Querys():
             self.session.rollback()
             print(f"Error al asignar carpeta al TestPlan: {str(e)}")
             raise
+
+    def insertar_testplan(self, nombre: str, descripcion: str, idProyecto: int, idUsuario: int):
+        try:
+            nuevo_testplan = TestPlan(Nombre=nombre, Descripcion=descripcion, idProyecto=idProyecto, idUsuario=idUsuario)
+            self.session.add(nuevo_testplan)
+            self.session.commit()
+            self.session.refresh(nuevo_testplan)
+            return nuevo_testplan
+        except Exception as e:
+            self.session.rollback()
+            print(f"Error al insertar TestPlan: {str(e)}")
+            raise

@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from commons.querys_testing import Querys
 from core.database import get_db
-from models.models import Carpeta, CarpetaTestPlan
+from models.models import Carpeta, CarpetaTestPlan, TestPlan
 
 router = APIRouter(prefix="/edshira/api/testing")
 
@@ -43,3 +43,13 @@ async def set_carpeta(CarpetaTest: CarpetaTestPlan, db: Session = Depends(get_db
         return {"message": "Carpeta asignada al TestPlan correctamente", "id": idCarpetaTest}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al asignar carpeta al TestPlan: {str(e)}")
+
+
+@router.post("/crear_testplan")
+async def crear_testplan(testplan: TestPlan, db: Session = Depends(get_db)):
+    try:
+        q = Querys(db)
+        nueva_testplan = q.insertar_testplan(testplan.Nombre, testplan.Descripcion, testplan.idProyecto, testplan.idUsuario)
+        return {"id": nueva_testplan.idTestPlan}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al crear TestPlan: {str(e)}")

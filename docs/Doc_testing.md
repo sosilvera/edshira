@@ -7,7 +7,7 @@
             - Padre: str - Nulleable - Default "Root"
             - Origen: str - "Plan" o "Execution"
     - Borrar carpetas
-    - Crear testPlan
+    - Crear testPlan [LISTO]
         - /crear_testplan -> idTestPlan
             - Nombre: str - Not Null
             - Usuario: str - Not Null

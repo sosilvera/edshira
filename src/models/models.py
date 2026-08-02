@@ -48,3 +48,9 @@ class Carpeta(BaseModel):
 class CarpetaTestPlan(BaseModel):
     idCarpeta: int
     idTestPlan: int
+
+class TestPlan(BaseModel):
+    Nombre: str
+    Descripcion: Optional[str] = None
+    idProyecto: int
+    idUsuario: int
