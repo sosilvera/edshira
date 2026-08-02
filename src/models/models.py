@@ -44,3 +44,7 @@ class Carpeta(BaseModel):
     Nombre: str
     Padre: str
     Origen: str
+
+class CarpetaTestPlan(BaseModel):
+    idCarpeta: int
+    idTestPlan: int

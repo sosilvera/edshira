@@ -14,7 +14,7 @@
             - Descripcion: str - Nulleable
             - idProyecto: int - Not Null
 
-        - Asignar carpeta al testPlan
+        - Asignar carpeta al testPlan [LISTO]
             - /set_carpeta -> 201
                 - idCarpeta
                 - idTestSet
@@ -44,5 +44,15 @@
 
 Descripcion:
 
-- En la pantalla Test Plan se escriben los casos, en Test Execution se ejecutan. Un Test Plan va a tener Test asociados, un Test Plan se asocia a una Carpeta para facilitar su organización. A diferencia de ALM, cada Test Plan tiene Test, pero los Test NO TIENEN Test Config.
+- En la pantalla Test Plan se escriben los casos, en Test Execution se ejecutan. 
+- Un Test Plan va a tener Test asociados, un Test Plan se asocia a una Carpeta para facilitar su organización. A diferencia de ALM, cada Test Plan tiene Test, pero los Test NO TIENEN Test Config.
 - En Test Execution, se crean Test Cycles y se asignan Test, quedan almacenados en la tabla test_execution para actualizar la ejecución desde ahi.
+
+
+------------------------ CARPETA ------------------------ 
+                            |
+                            v
+            Test Plan 1 | Test Plan 2 | Test Plan N
+                |
+                V
+    Case 1| Case 2 | Caso N

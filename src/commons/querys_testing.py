@@ -1,4 +1,4 @@
-from schema.models import (Base, Usuario, TipoTarea, EstadoTarea, Proyecto, ProyectoSprint, TestPlan, TestCycle, Tarea, Test, TestExecution, DefectoTest, UsuarioProyecto, Carpeta)
+from schema.models import (Base, Usuario, TipoTarea, EstadoTarea, Proyecto, ProyectoSprint, TestPlan, TestCycle, Tarea, Test, TestExecution, DefectoTest, UsuarioProyecto, Carpeta, CarpetaTestPlan)
 from sqlalchemy import create_engine, func, and_, or_, update
 from sqlalchemy.orm import sessionmaker, aliased
 from datetime import datetime
@@ -34,4 +34,16 @@ class Querys():
         except Exception as e:
             self.session.rollback()
             print(f"Error al insertar carpeta: {str(e)}")
+            raise
+
+    def asignar_carpeta_a_testplan(self, idCarpeta: int, idTestPlan: int):
+        try:
+            carpeta_testplan = CarpetaTestPlan(idCarpeta=idCarpeta, idTestPlan=idTestPlan)
+            self.session.add(carpeta_testplan)
+            self.session.commit()
+            self.session.refresh(carpeta_testplan)
+            return carpeta_testplan
+        except Exception as e:
+            self.session.rollback()
+            print(f"Error al asignar carpeta al TestPlan: {str(e)}")
             raise
