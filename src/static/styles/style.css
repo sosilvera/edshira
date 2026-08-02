@@ -105,6 +105,7 @@ body {
     flex-direction: column;
     gap: 20px;
     overflow: hidden;
+    min-width: 0;
 }
 .global-navbar {
     display: flex;
@@ -568,7 +569,7 @@ body {
 
 /* Lista tipo árbol */
 .tree-list { list-style: none; padding-left: 0; }
-.tree-sublist { list-style: none; padding-left: 20px; margin-top: 8px; display: none; }
+.tree-sublist { list-style: none; padding-left: 20px; margin-top: 8px; display: none; width: 100%;}
 .tree-node.expanded .tree-sublist { display: block; }
 
 .tree-node, .tree-leaf {
@@ -579,6 +580,7 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
 }
 .tree-node:hover, .tree-leaf:hover { color: #f8fafc; }
 .tree-leaf.active { color: #3b82f6; font-weight: 600; }
@@ -591,6 +593,8 @@ body {
     gap: 20px;
     flex-grow: 1;
     overflow: hidden;
+    min-width: 0;
+    width: 0;
 }
 
 /* Grilla superior de Casos */
@@ -694,16 +698,59 @@ body {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    overflow-y: auto;
+    overflow-y: scroll;
+    width: 100%;
 }
 .detail-field {
     font-size: 0.95rem;
     line-height: 1.5;
+    display: flex;
+    flex-direction: column; /* Pasamos el título arriba y el texto abajo para ganar más espacio */
+    gap: 4px;
 }
+
 .detail-field strong {
     color: #94a3b8;
     margin-right: 8px;
 }
 .detail-field span {
     color: #f1f5f9;
+    white-space: pre-wrap; /* MAGIA: Hace que los \n de tu API funcionen como Enter real */
+    overflow-wrap: break-word; /* Corta palabras ultra largas (ej: un link) */
+    word-break: break-word;
+    width: 100%;
+}
+
+/* Cabecera del sidebar de testing */
+.testing-sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.testing-sidebar-header .testing-sidebar-title {
+    margin-bottom: 0; /* Reseteamos el margen original para que quede alineado */
+}
+
+.sidebar-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-icon {
+    background-color: #334155;
+    color: #cbd5e1;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+    background-color: #3b82f6;
+    color: #ffffff;
 }

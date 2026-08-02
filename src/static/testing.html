@@ -73,7 +73,13 @@
                 
                 <!-- Panel Izquierdo: Árbol de Carpetas -->
                 <div class="testing-sidebar">
-                    <h3 class="testing-sidebar-title">Carpetas</h3>
+                    <div class="testing-sidebar-header">
+                        <h3 class="testing-sidebar-title">Carpetas</h3>
+                        <div class="sidebar-actions">
+                            <button id="btn-open-create-folder" class="btn-icon" title="Crear Carpeta">📁+</button>
+                            <button id="btn-open-create-testplan" class="btn-icon" title="Crear Test Plan">📋+</button>
+                        </div>
+                    </div>
                     <!-- CONTENEDOR DINÁMICO DE CARPETAS -->
                     <ul class="tree-list" id="folder-tree-container">
                         <li class="tree-leaf loading-text">Cargando carpetas...</li>
@@ -188,6 +194,80 @@
         </main>
     </div>
     
+    <div id="create-test-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Crear Caso de Prueba</h2>
+                <button class="close-modal" id="close-create-test-modal">✖</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Título del Caso</label>
+                    <input type="text" id="create-test-title" class="modal-input" placeholder="Ej: Crear Orden">
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="create-test-desc" class="modal-input" rows="2" placeholder="Detalles generales..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Precondiciones</label>
+                    <textarea id="create-test-pre" class="modal-input" rows="2" placeholder="Condiciones previas necesarias..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Resultado Esperado</label>
+                    <textarea id="create-test-res" class="modal-input" rows="2" placeholder="Qué debería pasar..."></textarea>
+                </div>
+                
+                <button id="btn-submit-test" class="btn-primary w-100">Crear Caso</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Crear Carpeta -->
+    <div id="create-folder-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Nueva Carpeta</h2>
+                <button class="close-modal" id="close-folder-modal">✖</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nombre de la Carpeta</label>
+                    <input type="text" id="create-folder-name" class="modal-input" placeholder="Ej: App iOS">
+                </div>
+                <button id="btn-submit-folder" class="btn-primary w-100">Crear Carpeta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Crear Test Plan -->
+    <div id="create-testplan-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <h2>Nuevo Test Plan</h2>
+                <button class="close-modal" id="close-testplan-modal">✖</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nombre del Plan</label>
+                    <input type="text" id="create-tp-name" class="modal-input" placeholder="Ej: Regresión Core">
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="create-tp-desc" class="modal-input" rows="2" placeholder="Objetivo del plan..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Asignar a Carpeta</label>
+                    <!-- Este select se va a llenar dinámicamente con JS -->
+                    <select id="create-tp-folder" class="modal-input">
+                        <option value="">Seleccione una carpeta...</option>
+                    </select>
+                </div>
+                <button id="btn-submit-testplan" class="btn-primary w-100">Crear Test Plan</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/static/js/testing.js"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@ const API_URL = 'http://localhost:30095/edshira/api'; // Ajustá la URL según t
 
 // Variable global para almacenar los casos y no tener que llamar a la API al ver detalles
 let currentTestCases = []; 
+let currentTestPlanId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -43,6 +44,209 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. INICIALIZAR DATOS DINÁMICOS
     // ==========================================
     cargarCarpetas();
+    
+    // ==========================================
+    // LÓGICA MODAL CREAR CASO DE PRUEBA
+    // ==========================================
+    const createTestModal = document.getElementById('create-test-modal');
+    const btnOpenCreateTest = document.querySelector('.btn-create-sm'); // El botón "+ Crear Caso"
+    const btnCloseCreateTest = document.getElementById('close-create-test-modal');
+    const btnSubmitTest = document.getElementById('btn-submit-test');
+
+    // Abrir Modal
+    btnOpenCreateTest.addEventListener('click', () => {
+        // Validamos que haya seleccionado un Test Plan antes de crear el caso
+        if (!currentTestPlanId) {
+            alert("Por favor, seleccioná un Test Plan en el árbol de carpetas primero.");
+            return;
+        }
+        createTestModal.style.display = 'flex';
+    });
+
+    // Cerrar Modal
+    btnCloseCreateTest.addEventListener('click', () => {
+        createTestModal.style.display = 'none';
+    });
+
+    // Enviar a la API
+    btnSubmitTest.addEventListener('click', async () => {
+        const title = document.getElementById('create-test-title').value.trim();
+        const desc = document.getElementById('create-test-desc').value.trim();
+        const pre = document.getElementById('create-test-pre').value.trim();
+        const res = document.getElementById('create-test-res').value.trim();
+
+        if (!title) {
+            alert("El título del caso es obligatorio.");
+            return;
+        }
+
+        // Armamos el texto gigante concatenado que espera tu API
+        const descripcionCombinada = `Descripcion: ${desc}\nPrecondiciones: ${pre}\nResultado Esperado: ${res}`;
+        
+        // Agarramos el usuario logueado de la caché
+        const userId = localStorage.getItem('userId');
+
+        btnSubmitTest.disabled = true;
+        btnSubmitTest.textContent = "Guardando...";
+
+        try {
+            const response = await fetch(`${API_URL}/testing/crear_test`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    Nombre: title,
+                    Descripcion: descripcionCombinada,
+                    idTestPlan: parseInt(currentTestPlanId),
+                    idUsuario: parseInt(userId)
+                })
+            });
+
+            if (!response.ok) throw new Error("Fallo al guardar en la API");
+
+            // Limpiamos los inputs
+            document.getElementById('create-test-title').value = '';
+            document.getElementById('create-test-desc').value = '';
+            document.getElementById('create-test-pre').value = '';
+            document.getElementById('create-test-res').value = '';
+            
+            // Ocultamos el modal
+            createTestModal.style.display = 'none';
+            
+            // Recargamos silenciosamente los casos para que aparezca el nuevo
+            const nombreTestPlan = document.getElementById('cases-section-title').textContent;
+            cargarCasosTestPlan(currentTestPlanId, nombreTestPlan);
+
+        } catch (error) {
+            console.error("Error al crear el caso de prueba:", error);
+            alert("Hubo un error al crear el caso.");
+        } finally {
+            btnSubmitTest.disabled = false;
+            btnSubmitTest.textContent = "Crear Caso";
+        }
+    });
+
+    // ==========================================
+    // LÓGICA: CREAR CARPETA Y TEST PLAN
+    // ==========================================
+    const modalFolder = document.getElementById('create-folder-modal');
+    const modalTestPlan = document.getElementById('create-testplan-modal');
+    const folderSelect = document.getElementById('create-tp-folder');
+
+    // --- Abrir / Cerrar Modal Carpeta ---
+    document.getElementById('btn-open-create-folder').addEventListener('click', () => {
+        modalFolder.style.display = 'flex';
+    });
+    document.getElementById('close-folder-modal').addEventListener('click', () => {
+        modalFolder.style.display = 'none';
+    });
+
+    // --- Abrir / Cerrar Modal Test Plan ---
+    document.getElementById('btn-open-create-testplan').addEventListener('click', async () => {
+        modalTestPlan.style.display = 'flex';
+        // Llenar el select con las carpetas actuales
+        folderSelect.innerHTML = '<option value="">Cargando carpetas...</option>';
+        try {
+            const res = await fetch(`${API_URL}/testing/get_carpetas`);
+            const carpetas = await res.json();
+            folderSelect.innerHTML = '<option value="">Seleccione una carpeta...</option>';
+            carpetas.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.idCarpeta;
+                opt.textContent = c.Nombre || c.nombre;
+                folderSelect.appendChild(opt);
+            });
+        } catch (e) {
+            folderSelect.innerHTML = '<option value="">Error al cargar carpetas</option>';
+        }
+    });
+    document.getElementById('close-testplan-modal').addEventListener('click', () => {
+        modalTestPlan.style.display = 'none';
+    });
+
+    // --- SUBMIT: Crear Carpeta ---
+    document.getElementById('btn-submit-folder').addEventListener('click', async () => {
+        const nombre = document.getElementById('create-folder-name').value.trim();
+        if (!nombre) return alert("Ingrese un nombre");
+
+        try {
+            // Asumiendo que tenés un endpoint crear_carpeta
+            const res = await fetch(`${API_URL}/testing/crear_carpeta`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ Nombre: nombre, Origen: "Test Plan" })
+            });
+            if (res.ok) {
+                document.getElementById('create-folder-name').value = '';
+                modalFolder.style.display = 'none';
+                cargarCarpetas(); // Refrescar el árbol
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Error al crear carpeta");
+        }
+    });
+
+    // --- SUBMIT: Crear Test Plan + Asociar a Carpeta ---
+    document.getElementById('btn-submit-testplan').addEventListener('click', async (e) => {
+        const nombre = document.getElementById('create-tp-name').value.trim();
+        const desc = document.getElementById('create-tp-desc').value.trim();
+        const idCarpeta = folderSelect.value;
+        const btn = e.target;
+
+        if (!nombre) return alert("El nombre es obligatorio");
+        if (!idCarpeta) return alert("Debe seleccionar una carpeta de destino");
+
+        const userId = localStorage.getItem('userId') || 1;
+        const projectId = localStorage.getItem('projectId') || 2; 
+
+        btn.disabled = true;
+        btn.textContent = "Creando...";
+
+        try {
+            // 1. Crear el Test Plan
+            const resPlan = await fetch(`${API_URL}/testing/crear_testplan`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    Nombre: nombre,
+                    Descripcion: desc,
+                    idProyecto: parseInt(projectId),
+                    idUsuario: parseInt(userId)
+                })
+            });
+
+            if (!resPlan.ok) throw new Error("Error al crear Test Plan");
+            
+            // Supongamos que tu API devuelve el ID del plan recién creado en "id" o "idTestPlan"
+            const dataPlan = await resPlan.json();
+            const nuevoIdPlan = dataPlan.id || dataPlan.idTestPlan; 
+
+            // 2. Asociarlo a la carpeta seleccionada (Usando el endpoint set_carpeta)
+            if (nuevoIdPlan) {
+                await fetch(`${API_URL}/testing/set_carpeta`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        idCarpeta: parseInt(idCarpeta),
+                        idTestPlan: parseInt(nuevoIdPlan)
+                    })
+                });
+            }
+
+            // 3. Limpiar y refrescar
+            document.getElementById('create-tp-name').value = '';
+            document.getElementById('create-tp-desc').value = '';
+            modalTestPlan.style.display = 'none';
+            cargarCarpetas(); // Recargar el árbol para ver los cambios
+
+        } catch (error) {
+            console.error(error);
+            alert("Ocurrió un error en el proceso");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Crear Test Plan";
+        }
+    });
 });
 
 // ==========================================
@@ -124,6 +328,7 @@ async function cargarCarpetas() {
 }
 
 async function cargarCasosTestPlan(idTestPlan, nombreTestPlan) {
+    currentTestPlanId = idTestPlan;
     document.getElementById('cases-section-title').textContent = nombreTestPlan;
     const listContainer = document.getElementById('cases-list-container');
     listContainer.innerHTML = '<div class="loading-text" style="padding: 20px;">Cargando casos...</div>';
