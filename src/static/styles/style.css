@@ -754,3 +754,36 @@ body {
     background-color: #3b82f6;
     color: #ffffff;
 }
+
+/* Layout específico para filas de ejecución (3 columnas) */
+.exec-row {
+    display: flex;
+    align-items: center;
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 10px 16px;
+    gap: 16px;
+    cursor: pointer;
+}
+
+.exec-row:hover { border-color: #475569; }
+.exec-row.active { border-color: #3b82f6; background-color: rgba(59, 130, 246, 0.1); }
+
+/* Botón pequeño para abrir el modal de ejecución */
+.btn-run-status {
+    background-color: #334155;
+    color: #f8fafc;
+    border: 1px solid #475569;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-run-status:hover {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}

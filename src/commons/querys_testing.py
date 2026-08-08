@@ -92,13 +92,13 @@ class Querys():
             print(f"Error al obtener el estado de ejecución del caso: {str(e)}")
             return None
 
-    def getCarpetas(self):
+    def getCarpetasPlan(self):
         try:
-            carpetas = self.session.query(Carpeta).all()
+            carpetas = self.session.query(Carpeta).filter(Carpeta.Origen == "Test Plan").all()
             result = []
 
             for c in carpetas:
-                test_plans = resultados = self.session.query(
+                test_plans = self.session.query(
                     CarpetaTestPlan.idTestPlan,
                     TestPlan.Nombre
                 ).join(
@@ -117,6 +117,53 @@ class Querys():
             return result if result else None
         except Exception as e:
             print(f"Error al obtener las carpetas: {str(e)}")
+            return None
+    
+    def getCarpetasExec(self):
+        try:
+            carpetas = self.session.query(Carpeta).filter(Carpeta.Origen == "Test Execution").all()
+            result = []
+
+            for c in carpetas:
+                test_plans = self.session.query(
+                    CarpetaTestExecution.idTestCycle,
+                    TestCycle.Nombre
+                ).join(
+                    TestCycle, TestCycle.idTestCycle == CarpetaTestExecution.idTestCycle
+                ).filter(
+                    CarpetaTestExecution.idCarpeta == c.idCarpeta
+                ).all()
+
+                result.append({
+                    "idCarpeta": c.idCarpeta,
+                    "Nombre": c.Nombre,
+                    "Origen": c.Origen,
+                    "TestCycles": [{"idTestCycle": tp.idTestCycle, "Nombre": tp.Nombre} for tp in test_plans] if test_plans else []
+                })
+            
+            return result if result else None
+        except Exception as e:
+            print(f"Error al obtener las carpetas: {str(e)}")
+            return None
+
+    def getCasesByTestExecution(self, idTestCycle: int):
+        try:
+            cases = self.session.query(
+                TestExecution.idTestCycle,
+                TestExecution.idTest,
+                Test.Nombre,
+                Test.Descripcion,
+                TestExecution.Estado,
+                TestExecution.FechaEjecucion
+            ).join(
+                Test, Test.idTest == TestExecution.idTest
+            ).filter(
+                TestExecution.idTestCycle == idTestCycle
+            ).all()
+
+            return [{"idTest": case.idTest, "idTestCycle": case.idTestCycle, "nombre": case.Nombre, "descripcion": case.Descripcion, "estado": case.Estado, "fechaEjecucion": case.FechaEjecucion} for case in cases] if cases else None
+        except Exception as e:
+            print(f"Error al obtener los casos por ciclo de prueba: {str(e)}")
             return None
 
     def insertar_testcycle(self, nombre: str, descripcion: str, idProyecto: int, idUsuario: int):

@@ -56,7 +56,14 @@
     - Crear test-cycle dentro de la carpeta [LISTO]
     - Listar test-cycles [LISTO]
     - Importar casos del testPlan al testCycle
+        - /import_case
+            - idTestCycle
+            - idUsuario
+            - tests[]
+        - 
     - Cambiar estado de un caso en el test-cycle [LISTO]
+    - Listar test por Test-Cycles
+        - /get_cases_by_testplan/{idTestExecution}
 
 
 Descripcion:

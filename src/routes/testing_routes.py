@@ -44,10 +44,18 @@ async def set_carpeta(CarpetaTest: CarpetaTestPlan, db: Session = Depends(get_db
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al asignar carpeta al TestPlan: {str(e)}")
 
-@router.get("/get_carpetas")
-async def get_carpetas(db: Session = Depends(get_db)):
+@router.get("/get_carpetas_plan")
+async def get_carpetas_plan(db: Session = Depends(get_db)):
     q = Querys(db)
-    carpetas = q.getCarpetas()
+    carpetas = q.getCarpetasPlan()
+    if not carpetas:
+        raise HTTPException(status_code=404, detail="Carpetas no encontradas")
+    return carpetas
+
+@router.get("/get_carpetas_execution")
+async def get_carpetas_exec(db: Session = Depends(get_db)):
+    q = Querys(db)
+    carpetas = q.getCarpetasExec()
     if not carpetas:
         raise HTTPException(status_code=404, detail="Carpetas no encontradas")
     return carpetas
@@ -115,3 +123,14 @@ async def execute_test(test_execution: TestExecution, db: Session = Depends(get_
         return {"message": "Test ejecutado correctamente", "id": executed_test}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al ejecutar test: {str(e)}")
+
+@router.get("/get_cases_by_testexecution/{idTestCycle}")
+async def get_cases_by_testexecution(idTestCycle: int, db: Session = Depends(get_db)):
+    try:
+        q = Querys(db)
+        cases = q.getCasesByTestExecution(idTestCycle)
+        if not cases:
+            raise HTTPException(status_code=404, detail="Casos no encontrados")
+        return cases
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al obtener casos por TestExecution: {str(e)}")
