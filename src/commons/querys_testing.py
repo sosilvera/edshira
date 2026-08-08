@@ -1,4 +1,4 @@
-from schema.models import (Base, Usuario, TipoTarea, EstadoTarea, Proyecto, ProyectoSprint, TestPlan, TestCycle, Tarea, Test, TestExecution, DefectoTest, UsuarioProyecto, Carpeta, CarpetaTestPlan)
+from schema.models import (Base, Usuario, TipoTarea, EstadoTarea, Proyecto, ProyectoSprint, TestPlan, TestCycle, Tarea, Test, TestExecution, DefectoTest, UsuarioProyecto, Carpeta, CarpetaTestPlan, CarpetaTestExecution)
 from sqlalchemy import create_engine, func, and_, or_, update
 from sqlalchemy.orm import sessionmaker, aliased
 from datetime import datetime
@@ -46,6 +46,18 @@ class Querys():
         except Exception as e:
             self.session.rollback()
             print(f"Error al asignar carpeta al TestPlan: {str(e)}")
+            raise
+
+    def asignar_carpeta_a_testcycle(self, idCarpeta: int, idTestCycle: int):
+        try:
+            carpeta_testcycle = CarpetaTestExecution(idCarpeta=idCarpeta, idTestCycle=idTestCycle)
+            self.session.add(carpeta_testcycle)
+            self.session.commit()
+            self.session.refresh(carpeta_testcycle)
+            return carpeta_testcycle
+        except Exception as e:
+            self.session.rollback()
+            print(f"Error al asignar carpeta al TestCycle: {str(e)}")
             raise
 
     def insertar_testplan(self, nombre: str, descripcion: str, idProyecto: int, idUsuario: int):
@@ -106,3 +118,50 @@ class Querys():
         except Exception as e:
             print(f"Error al obtener las carpetas: {str(e)}")
             return None
+
+    def insertar_testcycle(self, nombre: str, descripcion: str, idProyecto: int, idUsuario: int):
+        try:
+            nuevo_testcycle = TestCycle(Nombre=nombre, idProyecto=idProyecto)
+            self.session.add(nuevo_testcycle)
+            self.session.commit()
+            self.session.refresh(nuevo_testcycle)
+            return nuevo_testcycle
+        except Exception as e:
+            self.session.rollback()
+            print(f"Error al insertar TestCycle: {str(e)}")
+            raise
+
+    def import_cases(self, idTestCycle: int, idUsuario: int, cases: list):
+        try:
+            for case in cases:
+                nuevo_test = TestExecution(idTestCycle=idTestCycle, idTest=case, idUsuario=idUsuario, Estado="Not Run", FechaEjecucion=None)
+                self.session.add(nuevo_test)
+            self.session.commit()
+            
+            return len(cases)
+        except Exception as e:
+            self.session.rollback()
+            print(f"Error al importar casos: {str(e)}")
+            raise
+
+    def execute_test(self, idTest: int, idTestCycle: int, estado: str, fechaEjecucion: str, idUsuario: int):
+        try:
+            test_execution = self.session.query(TestExecution).filter(
+                TestExecution.idTest == idTest,
+                TestExecution.idTestCycle == idTestCycle
+            ).first()
+
+            if not test_execution:
+                raise Exception("No se encontró la ejecución del test especificado.")
+
+            test_execution.Estado = estado
+            test_execution.FechaEjecucion = fechaEjecucion
+            test_execution.idUsuario = idUsuario
+
+            self.session.commit()
+            self.session.refresh(test_execution)
+            return test_execution
+        except Exception as e:
+            self.session.rollback()
+            print(f"Error al ejecutar el test: {str(e)}")
+            raise

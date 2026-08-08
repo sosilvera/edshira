@@ -60,3 +60,25 @@ class Test(BaseModel):
     Descripcion: Optional[str] = None
     idTestPlan: int
     idUsuario: int
+
+class TestCycle(BaseModel):
+    Nombre: str
+    Descripcion: Optional[str] = None
+    idProyecto: int
+    idUsuario: int
+
+class CarpetaTestCycle(BaseModel):
+    idCarpeta: int
+    idTestCycle: int
+
+class CasesList(BaseModel):
+    idTestCycle: int
+    idUsuario: int
+    tests: list
+
+class TestExecution(BaseModel):
+    idTest: int
+    idTestCycle: int
+    Estado: str
+    FechaEjecucion: str
+    idUsuario: int

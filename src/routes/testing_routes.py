@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from commons.querys_testing import Querys
 from core.database import get_db
-from models.models import Carpeta, CarpetaTestPlan, TestPlan, Test
+from models.models import Carpeta, CarpetaTestPlan, TestPlan, Test, TestCycle, CarpetaTestCycle, CasesList, TestExecution
 
 router = APIRouter(prefix="/edshira/api/testing")
 
@@ -77,3 +77,41 @@ async def get_execution_state(idTest: int, db: Session = Depends(get_db)):
     if not estado:
         raise HTTPException(status_code=404, detail="Estado de ejecución no encontrado")
     return estado
+
+@router.post("/crear_testcycle")
+async def crear_testcycle(testcycle: TestCycle, db: Session = Depends(get_db)):
+    try:
+        q = Querys(db)
+        nuevo_testcycle = q.insertar_testcycle(testcycle.Nombre, testcycle.Descripcion, testcycle.idProyecto, testcycle.idUsuario)
+        return {"id": nuevo_testcycle.idTestCycle}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al crear TestCycle: {str(e)}")
+
+@router.post("/asignar_carpeta_testcycle")
+async def asignar_carpeta_testcycle(carpeta_testcycle: CarpetaTestCycle, db: Session = Depends(get_db)):
+    try:
+        q = Querys(db)
+        idCarpetaTestCycle = q.asignar_carpeta_a_testcycle(carpeta_testcycle.idCarpeta, carpeta_testcycle.idTestCycle)
+        return {"message": "Carpeta asignada al TestCycle correctamente", "id": idCarpetaTestCycle}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al asignar carpeta al TestCycle: {str(e)}")
+
+
+@router.post("/import_cases")
+async def import_cases(cases: CasesList, db: Session = Depends(get_db)):
+    try:
+        q = Querys(db)
+        imported_cases = q.import_cases(cases.idTestCycle, cases.idUsuario, cases.tests)
+        print(cases.tests)
+        return {"message": "Casos importados correctamente", "cantidad_importada": imported_cases}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al importar casos: {str(e)}")
+        
+@router.post("/execute_test")
+async def execute_test(test_execution: TestExecution, db: Session = Depends(get_db)):
+    try:
+        q = Querys(db)
+        executed_test = q.execute_test(test_execution.idTest, test_execution.idTestCycle, test_execution.Estado, test_execution.FechaEjecucion. test_execution.idUsuario)
+        return {"message": "Test ejecutado correctamente", "id": executed_test}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al ejecutar test: {str(e)}")
