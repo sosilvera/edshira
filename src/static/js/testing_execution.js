@@ -84,20 +84,144 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Lógica del Modal: Importar Casos ---
     const modalImport = document.getElementById('import-cases-modal');
     
-    document.getElementById('btn-open-import').addEventListener('click', () => {
+    document.getElementById('btn-open-import').addEventListener('click', async () => {
         if (!currentTestCycleId) return alert("Seleccioná un Test Cycle primero.");
+        
         modalImport.style.display = 'flex';
+        
+        const treeContainer = document.getElementById('import-folder-tree');
+        const casesContainer = document.getElementById('import-cases-list');
+        document.getElementById('import-cases-title').textContent = 'Casos del Test Plan (0)';
+        
+        casesContainer.innerHTML = '<div class="loading-text" style="font-size: 0.85rem;">Seleccioná un Test Plan arriba.</div>';
+        treeContainer.innerHTML = '<li class="loading-text">Cargando carpetas...</li>';
+
+        try {
+            // Llamamos a la API de los planes
+            const res = await fetch(`${API_URL}/testing/get_carpetas_plan`);
+            let carpetas = await res.json();
+            
+            // Filtramos las carpetas que NO tienen planes para no ensuciar la vista
+            carpetas = carpetas.filter(c => c.TestPlans && c.TestPlans.length > 0);
+            treeContainer.innerHTML = '';
+            
+            if(carpetas.length === 0) {
+                 treeContainer.innerHTML = '<li class="loading-text">No hay Test Plans disponibles.</li>';
+                 return;
+            }
+
+            carpetas.forEach(carpeta => {
+                const folderLi = document.createElement('li');
+                folderLi.className = 'tree-node';
+                folderLi.innerHTML = `<span class="tree-toggle">▶</span> ${carpeta.Nombre || carpeta.nombre}`;
+                
+                const subList = document.createElement('ul');
+                subList.className = 'tree-sublist';
+                
+                carpeta.TestPlans.forEach(plan => {
+                    const planLi = document.createElement('li');
+                    planLi.className = 'tree-leaf';
+                    planLi.textContent = plan.Nombre || plan.nombre;
+                    
+                    // Evento al hacer clic en el Test Plan dentro del modal
+                    planLi.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        // Resetear clases activas solo dentro del modal
+                        document.querySelectorAll('#import-folder-tree .tree-leaf').forEach(l => l.classList.remove('active'));
+                        planLi.classList.add('active');
+                        
+                        // Llamar a los casos
+                        cargarCasosParaImportar(plan.idTestPlan, plan.Nombre || plan.nombre);
+                    });
+                    
+                    subList.appendChild(planLi);
+                });
+                
+                folderLi.appendChild(subList);
+                
+                folderLi.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('tree-leaf')) return;
+                    folderLi.classList.toggle('expanded');
+                    const icon = folderLi.querySelector('.tree-toggle');
+                    if (icon) icon.textContent = folderLi.classList.contains('expanded') ? '▼' : '▶';
+                });
+                
+                treeContainer.appendChild(folderLi);
+            });
+        } catch (error) {
+            console.error(error);
+            treeContainer.innerHTML = '<li style="color:#ef4444;">Error al cargar carpetas</li>';
+        }
     });
-    
+
     document.getElementById('close-import-modal').addEventListener('click', () => modalImport.style.display = 'none');
 
-    document.getElementById('btn-submit-import').addEventListener('click', async (e) => {
-        const idsString = document.getElementById('import-cases-ids').value.trim();
-        if (!idsString) return;
-
-        const testsArray = idsString.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
-        const userId = localStorage.getItem('userId') || 1;
+    // Función auxiliar para traer y dibujar los casos con checkbox
+    async function cargarCasosParaImportar(idTestPlan, nombrePlan) {
+        const casesContainer = document.getElementById('import-cases-list');
+        const titleLabel = document.getElementById('import-cases-title');
         
+        casesContainer.innerHTML = '<div class="loading-text" style="font-size: 0.85rem;">Cargando casos...</div>';
+        
+        try {
+            const res = await fetch(`${API_URL}/testing/get_cases_by_testplan/${idTestPlan}`);
+            const casos = await res.json();
+            
+            titleLabel.textContent = `Casos de: ${nombrePlan} (${casos.length})`;
+            casesContainer.innerHTML = '';
+            
+            if (casos.length === 0) {
+                casesContainer.innerHTML = '<div class="loading-text" style="font-size: 0.85rem;">Este Test Plan no tiene casos.</div>';
+                return;
+            }
+            
+            // Botón "Seleccionar Todos" (Excelente práctica de UX)
+            const selectAllDiv = document.createElement('div');
+            selectAllDiv.style.marginBottom = '12px';
+            selectAllDiv.style.borderBottom = '1px solid #334155';
+            selectAllDiv.style.paddingBottom = '12px';
+            selectAllDiv.innerHTML = `
+                <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="import-select-all"> <strong>Seleccionar Todos</strong>
+                </label>
+            `;
+            casesContainer.appendChild(selectAllDiv);
+            
+            // Renderizado de la lista de casos
+            casos.forEach(caso => {
+                const casoDiv = document.createElement('div');
+                const idCaso = caso.idTest || caso.id;
+                casoDiv.innerHTML = `
+                    <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; padding: 6px 0; cursor: pointer;">
+                        <input type="checkbox" class="import-case-cb" value="${idCaso}">
+                        <span style="font-size: 0.9rem;">${caso.nombre || caso.Titulo}</span>
+                    </label>
+                `;
+                casesContainer.appendChild(casoDiv);
+            });
+            
+            // Evento de "Seleccionar Todos"
+            document.getElementById('import-select-all').addEventListener('change', (e) => {
+                const checkboxes = document.querySelectorAll('.import-case-cb');
+                checkboxes.forEach(cb => cb.checked = e.target.checked);
+            });
+            
+        } catch (error) {
+            casesContainer.innerHTML = '<div style="color:#ef4444; font-size: 0.85rem;">Error al cargar casos</div>';
+        }
+    }
+
+    // Submit de importación
+    document.getElementById('btn-submit-import').addEventListener('click', async (e) => {
+        // Obtenemos todos los checkboxes que estén marcados
+        const checkboxes = document.querySelectorAll('.import-case-cb:checked');
+        const testsArray = Array.from(checkboxes).map(cb => parseInt(cb.value));
+        
+        if (testsArray.length === 0) {
+            return alert("Seleccioná al menos un caso de prueba para importar.");
+        }
+        
+        const userId = localStorage.getItem('userId') || 1;
         e.target.textContent = "Importando...";
         e.target.disabled = true;
 
@@ -108,19 +232,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     idTestCycle: parseInt(currentTestCycleId),
                     idUsuario: parseInt(userId),
-                    tests: testsArray
+                    tests: testsArray // Mandamos la lista final filtrada a la API
                 })
             });
             
             modalImport.style.display = 'none';
-            document.getElementById('import-cases-ids').value = '';
             
+            // Recargamos la grilla maestra para ver los nuevos casos en el ciclo
             const nombreCiclo = document.getElementById('exec-section-title').textContent;
             cargarCasosTestCycle(currentTestCycleId, nombreCiclo);
         } catch (error) {
             alert("Error al importar casos");
         } finally {
-            e.target.textContent = "Importar";
+            e.target.textContent = "Importar Seleccionados";
             e.target.disabled = false;
         }
     });
@@ -163,6 +287,52 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.disabled = false;
         }
     });
+
+    // --- Lógica del Modal: Crear Carpeta (Test Execution) ---
+    const modalExecFolder = document.getElementById('create-exec-folder-modal');
+    
+    document.getElementById('btn-open-create-exec-folder').addEventListener('click', () => {
+        modalExecFolder.style.display = 'flex';
+    });
+    
+    document.getElementById('close-exec-folder-modal').addEventListener('click', () => {
+        modalExecFolder.style.display = 'none';
+    });
+
+    document.getElementById('btn-submit-exec-folder').addEventListener('click', async (e) => {
+        const nombre = document.getElementById('create-exec-folder-name').value.trim();
+        if (!nombre) return alert("Ingrese un nombre para la carpeta");
+
+        const btn = e.target;
+        btn.disabled = true;
+        btn.textContent = "Creando...";
+
+        try {
+            const res = await fetch(`${API_URL}/testing/crear_carpeta`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                // ACA ESTÁ LA MAGIA: Le decimos a la base de datos que esta carpeta es de Ejecución
+                body: JSON.stringify({ Nombre: nombre, Padre: "null", Origen: "Test Execution" }) 
+            });
+            
+            if (res.ok) {
+                document.getElementById('create-exec-folder-name').value = '';
+                modalExecFolder.style.display = 'none';
+                
+                // Recargamos el árbol de ciclos para que aparezca la nueva carpeta
+                cargarCarpetasEjecucion(); 
+            } else {
+                throw new Error("Fallo al crear la carpeta en el servidor");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error al crear la carpeta de ejecución");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Crear Carpeta";
+        }
+    });
+
 });
 
 // ==========================================

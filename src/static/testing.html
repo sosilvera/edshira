@@ -128,8 +128,9 @@
                 
                 <div class="testing-sidebar">
                     <div class="testing-sidebar-header">
-                        <h3 class="testing-sidebar-title">Ciclos (Test Cycles)</h3>
+                        <h3 class="testing-sidebar-title">Ciclos</h3>
                         <div class="sidebar-actions">
+                            <button id="btn-open-create-exec-folder" class="btn-icon" title="Crear Carpeta">📁+</button>
                             <button id="btn-open-create-cycle" class="btn-icon" title="Crear Ciclo">🔄+</button>
                         </div>
                     </div>
@@ -280,19 +281,38 @@
         </div>
     </div>
 
+<!-- Modal Importar Casos (Simil ALM) -->
     <div id="import-cases-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-content modal-lg"> <!-- Agregamos modal-lg para hacerlo más ancho -->
             <div class="modal-header">
                 <h2>Importar Casos al Ciclo</h2>
                 <button class="close-modal" id="close-import-modal">✖</button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>IDs de los Casos (separados por coma)</label>
-                    <input type="text" id="import-cases-ids" class="modal-input" placeholder="Ej: 3, 5, 12">
-                    <p class="error-text" style="color: #94a3b8; font-size: 0.8rem; margin-top: 4px;">Ingresá los IDs numéricos de los Test Cases.</p>
+                <p class="modal-subtitle">Seleccioná un Test Plan para ver sus casos y agregarlos a la ejecución.</p>
+                
+                <!-- Layout Dividido Arriba/Abajo -->
+                <div style="display: flex; flex-direction: column; gap: 16px; height: 450px;">
+                    
+                    <!-- Panel Superior: Árbol de Test Plans -->
+                    <div style="flex: 1; border: 1px solid #334155; border-radius: 8px; padding: 16px; overflow-y: auto; background-color: #0f172a;">
+                        <ul class="tree-list" id="import-folder-tree">
+                            <li class="loading-text">Cargando carpetas...</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Panel Inferior: Casos y Checkboxes -->
+                    <div style="flex: 1; border: 1px solid #334155; border-radius: 8px; padding: 16px; overflow-y: auto; background-color: #0f172a;">
+                        <h4 id="import-cases-title" style="margin-bottom: 12px; color: #94a3b8; font-size: 0.9rem; text-transform: uppercase;">Casos del Test Plan (0)</h4>
+                        
+                        <div id="import-cases-list" style="display: flex; flex-direction: column; gap: 8px;">
+                            <div class="loading-text" style="font-size: 0.85rem;">Seleccioná un Test Plan arriba.</div>
+                        </div>
+                    </div>
+
                 </div>
-                <button id="btn-submit-import" class="btn-primary w-100">Importar</button>
+
+                <button id="btn-submit-import" class="btn-primary w-100" style="margin-top: 20px;">Importar Seleccionados</button>
             </div>
         </div>
     </div>
@@ -314,6 +334,23 @@
                     </select>
                 </div>
                 <button id="btn-submit-execute" class="btn-primary w-100">Guardar Ejecución</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Crear Carpeta (Test Execution) -->
+    <div id="create-exec-folder-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Nueva Carpeta de Ejecución</h2>
+                <button class="close-modal" id="close-exec-folder-modal">✖</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nombre de la Carpeta</label>
+                    <input type="text" id="create-exec-folder-name" class="modal-input" placeholder="Ej: Regresión Q3">
+                </div>
+                <button id="btn-submit-exec-folder" class="btn-primary w-100">Crear Carpeta</button>
             </div>
         </div>
     </div>
