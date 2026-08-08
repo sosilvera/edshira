@@ -86,7 +86,7 @@ class Querys():
 
     def getEstadoEjecucion(self, idTest: int):
         try:
-            estado = self.session.query(TestExecution).filter(TestExecution.idTest == idTest).first()
+            estado = self.session.query(TestExecution).filter(TestExecution.idTest == idTest).order_by(TestExecution.FechaEjecucion.desc()).first()
             return {"idTest": estado.idTest, "idTestCycle": estado.idTestCycle, "estado": estado.Estado, "fechaEjecucion": estado.FechaEjecucion} if estado else "Not Run"
         except Exception as e:
             print(f"Error al obtener el estado de ejecución del caso: {str(e)}")
@@ -154,8 +154,9 @@ class Querys():
             if not test_execution:
                 raise Exception("No se encontró la ejecución del test especificado.")
 
+
             test_execution.Estado = estado
-            test_execution.FechaEjecucion = fechaEjecucion
+            test_execution.FechaEjecucion = datetime.strptime(fechaEjecucion, "%d/%m/%Y")
             test_execution.idUsuario = idUsuario
 
             self.session.commit()

@@ -111,7 +111,7 @@ async def import_cases(cases: CasesList, db: Session = Depends(get_db)):
 async def execute_test(test_execution: TestExecution, db: Session = Depends(get_db)):
     try:
         q = Querys(db)
-        executed_test = q.execute_test(test_execution.idTest, test_execution.idTestCycle, test_execution.Estado, test_execution.FechaEjecucion. test_execution.idUsuario)
+        executed_test = q.execute_test(test_execution.idTest, test_execution.idTestCycle, test_execution.Estado, test_execution.FechaEjecucion, test_execution.idUsuario)
         return {"message": "Test ejecutado correctamente", "id": executed_test}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al ejecutar test: {str(e)}")

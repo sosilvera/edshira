@@ -48,10 +48,15 @@
                 - idTestPlan
 
 - Test Execution
-    - Crear carpeta dentro de Test Execution
-    - Crear test-cycle dentro de la carpeta
-        - Importar casos del testPlan
-        - Cambiar estado de un caso en el test-cycle
+    - Crear carpeta dentro de Test Execution [LISTO]
+        - /crear_carpeta -> idCarpeta 
+        - Recibe Origen, que puede ser Test Plan o Test Execution
+    - Listar carpetas [LISTO]
+        - En el FE hay que filtrar por Test Execution
+    - Crear test-cycle dentro de la carpeta [LISTO]
+    - Listar test-cycles [LISTO]
+    - Importar casos del testPlan al testCycle
+    - Cambiar estado de un caso en el test-cycle [LISTO]
 
 
 Descripcion:
@@ -72,3 +77,5 @@ Descripcion:
 
 Pendiente:
 - Ver como armar una tabla en cache que tenga los posibles estados validos de los casos, cosa de no tener que levantarlos de la BD cada vez que se quiere crear un caso
+- Agregar color a los estados de los casos
+- Agregar accion a 'Crear historia' en Testing
