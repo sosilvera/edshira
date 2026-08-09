@@ -3,6 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 import os
+import ssl # <-- Importamos la librería nativa SSL
 
 # El engine maneja el pool de conexiones. Se crea UNA sola vez.
 load_dotenv()
@@ -13,12 +14,15 @@ db_password = os.getenv("DB_PASSWORD")
 db_name = os.getenv("DB_NAME")
 
 connect_args = {}
-if "aivencloud.com" in DATABASE_URL:
-    # Esta ruta de certificados viene por defecto en el contenedor de Python de Cloud Run
-    connect_args = {"ssl": {"ca": "/etc/ssl/certs/ca-certificates.crt"}}
-    
+if db_host and "aivencloud.com" in db_host:
+    # Creamos un contexto SSL que encripte los datos pero ignore la verificación estricta del certificado autofirmado
+    ssl_context = ssl.create_default_context()
+    ssl_context.check_hostname = False
+    ssl_context.verify_mode = ssl.CERT_NONE
+    connect_args = {"ssl": ssl_context}
+
 SQLALCHEMY_DATABASE_URL = f"mysql+pymysql://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}"
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args=connect_args)
 
 # Fábrica de sesiones
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

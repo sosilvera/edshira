@@ -11,6 +11,12 @@ INSERT INTO Tipo_Tarea (Nombre) VALUES
 ('Bug'),
 ('User Story');
 
+INSERT INTO estado_tarea (Nombre) VALUES (1, 'To Do');
+INSERT INTO estado_tarea (Nombre) VALUES (2, 'In Progress');
+INSERT INTO estado_tarea (Nombre) VALUES (3, 'Testing');
+INSERT INTO estado_tarea (Nombre) VALUES (4, 'Done');
+
+
 -- 2. Tablas de Nivel 1 (Dependen de Usuarios)
 
 -- Creamos un par de proyectos (asignando un idUser como Project Manager)
@@ -33,8 +39,8 @@ INSERT INTO Proyecto_Sprint (idProyecto, NroSprint, Objetivo, Fecha_Inicio, Fech
 
 -- Planes de prueba (Test Plans)
 INSERT INTO Test_Plans (Nombre, Descripcion, idProyecto, idUsuario) VALUES 
-('Plan de Pruebas - Backend Auth', 'Cobertura de pruebas para la implementación de JWT y roles', 1, 3),
-('Plan Regresión - Impuestos', 'Validación de IIBB Santa Fe e Impuestos Internos en Fusion', 2, 3);
+('Plan de Pruebas - Backend Auth', 'Cobertura de pruebas para la implementación de JWT y roles', 1, 1),
+('Plan Regresión - Impuestos', 'Validación de IIBB Santa Fe e Impuestos Internos en Fusion', 2, 1);
 
 -- Ciclos de prueba (Test Cycles)
 INSERT INTO Test_Cycle (Nombre, idProyecto) VALUES 

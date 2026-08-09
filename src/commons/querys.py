@@ -133,6 +133,8 @@ class Querys():
             join(Proyecto, Proyecto.idProyecto == Tarea.idProyecto).\
             filter(Proyecto.idProyecto == idProyecto).group_by(Proyecto.idProyecto).scalar()
         
+        if counter is None:
+            counter = 0
         print("Counter:", counter)
         return counter
 
@@ -144,11 +146,11 @@ class Querys():
             # Contar las tareas en los sprints del proyecto
             count_tareas = self.countTareasProyecto(payload.idProyecto)
 
-            print("Cantidad de tareas en el proyecto:", count_tareas)
+            print("3. Cantidad de tareas en el proyecto:", count_tareas)
 
             # Generar el código
             codigo = f"{payload.codigoProyecto}-{count_tareas + 1}"
-            print("Código generado:", codigo)
+            print("3. Código generado:", codigo)
             
             nueva_tarea = Tarea(
                 Titulo=payload.titulo,

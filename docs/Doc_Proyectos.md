@@ -12,6 +12,8 @@
     - Gestionar backlog
         - Listar backlog [LISTO]
         - Asignar tareas a sprints [PENDIENTE]
+    - SprintActivo [LISTO]
+        - Trae el ultimo sprint por idProyecto
 - Tareas
     - Crear tarea [LISTO]
         - Tipos de tarea: Epica, Historia de Usuario, Defecto

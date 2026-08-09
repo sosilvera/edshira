@@ -86,3 +86,4 @@ Pendiente:
 - Ver como armar una tabla en cache que tenga los posibles estados validos de los casos, cosa de no tener que levantarlos de la BD cada vez que se quiere crear un caso
 - Agregar color a los estados de los casos
 - Agregar accion a 'Crear historia' en Testing
+- Agregar link para defectos-casos de prueba

@@ -61,10 +61,11 @@ async def crear_tarea(payload: CreateTaskRequest, db: Session = Depends(get_db))
     if payload.toSprint:
         idSprint = q.getIDSprintActivo(payload.idProyecto)
         payload.idSprint = idSprint
+        print("1. ID del sprint activo:", idSprint)
         if not idSprint:
             raise HTTPException(status_code=400, detail="No hay un sprint activo en este proyecto para asignar la tarea")
     
-    print("Payload recibido en API:", payload)
+    print("2. Payload recibido en API:", payload)
     result = q.createTarea(payload)
 
     return result

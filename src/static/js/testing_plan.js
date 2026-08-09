@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modalTestPlan.style.display = 'flex';
         folderSelect.innerHTML = '<option value="">Cargando carpetas...</option>';
         try {
-            const res = await fetch(`${API_URL}/testing/get_carpetas_plan_plan`);
+            const res = await fetch(`${API_URL}/testing/get_carpetas_plan`);
             const carpetas = await res.json();
             folderSelect.innerHTML = '<option value="">Seleccione una carpeta...</option>';
             carpetas.forEach(c => {
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(`${API_URL}/testing/crear_carpeta`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ Nombre: nombre, Origen: "Test Plan" })
+                body: JSON.stringify({ Nombre: nombre, Padre: "", Origen: "Test Plan" })
             });
             if (res.ok) {
                 document.getElementById('create-folder-name').value = '';
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         idCarpeta: parseInt(idCarpeta),
-                        idTestSet: parseInt(nuevoIdPlan)
+                        idTestPlan: parseInt(nuevoIdPlan)
                     })
                 });
             }

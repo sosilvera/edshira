@@ -1,7 +1,9 @@
-create database edshira;
-use edshira;
+CREATE DATABASE edshira;
+USE edshira;
 
+-- ========================================================
 -- 1. Tablas independientes (Sin Foreign Keys)
+-- ========================================================
 CREATE TABLE Usuarios (
     idUsuario INT AUTO_INCREMENT PRIMARY KEY,
     Nombre VARCHAR(255) NOT NULL,
@@ -25,7 +27,9 @@ CREATE TABLE Carpeta (
     Origen VARCHAR(255) NOT NULL
 );
 
+-- ========================================================
 -- 2. Tablas de Nivel 1 (Dependen de Usuarios)
+-- ========================================================
 CREATE TABLE Proyecto (
     idProyecto INT AUTO_INCREMENT PRIMARY KEY,
     Nombre VARCHAR(255) NOT NULL,
@@ -42,7 +46,9 @@ CREATE TABLE Usuario_Proyecto (
     FOREIGN KEY (idProyecto) REFERENCES Proyecto(idProyecto) ON DELETE CASCADE
 );
 
--- 3. Tablas de Nivel 2 (Dependen de Proyecto)
+-- ========================================================
+-- 3. Tablas de Nivel 2 (Dependen de Proyecto y Usuarios)
+-- ========================================================
 CREATE TABLE Proyecto_Sprint (
     idProySprint INT AUTO_INCREMENT PRIMARY KEY,
     idProyecto INT NOT NULL,
@@ -71,18 +77,26 @@ CREATE TABLE Test_Cycle (
     FOREIGN KEY (idProyecto) REFERENCES Proyecto(idProyecto) ON DELETE CASCADE
 );
 
--- 4. Tablas de Nivel 3 (Dependen de Sprints, Test_Plans y Tipo_Tarea)
+-- ========================================================
+-- 4. Tablas de Nivel 3 (Dependen de Sprints, Test_Plans, etc.)
+-- ========================================================
 CREATE TABLE Tareas (
     idTarea INT AUTO_INCREMENT PRIMARY KEY,
-    codigo VARCHAR(50) NOT NULL,
+    idProyecto INT NOT NULL, -- Agregado
+    codigo VARCHAR(50) UNIQUE, -- Modificado a NULL y UNIQUE
     Titulo VARCHAR(255) NOT NULL,
     Descripcion TEXT,
     file VARCHAR(255),
+    UsuarioCreador INT, -- Agregado
     idResponsable INT,
     idTipo INT,
+    idEstadoTarea INT, -- Agregado
     idSprint INT,
+    FOREIGN KEY (idProyecto) REFERENCES Proyecto(idProyecto) ON DELETE CASCADE,
+    FOREIGN KEY (UsuarioCreador) REFERENCES Usuarios(idUsuario) ON DELETE SET NULL,
     FOREIGN KEY (idResponsable) REFERENCES Usuarios(idUsuario) ON DELETE SET NULL,
     FOREIGN KEY (idTipo) REFERENCES Tipo_Tarea(idTipo) ON DELETE SET NULL,
+    FOREIGN KEY (idEstadoTarea) REFERENCES Estado_Tarea(idEstado) ON DELETE SET NULL,
     FOREIGN KEY (idSprint) REFERENCES Proyecto_Sprint(idProySprint) ON DELETE CASCADE
 );
 
@@ -96,12 +110,15 @@ CREATE TABLE Tests (
     FOREIGN KEY (idUsuario) REFERENCES Usuarios(idUsuario) ON DELETE SET NULL
 );
 
--- 5. Tablas de Nivel 4 (Tablas intermedias / Relacionales de Tests)
+-- ========================================================
+-- 5. Tablas de Nivel 4 (Tablas intermedias / Relacionales)
+-- ========================================================
 CREATE TABLE Test_Execution (
     idTestCycle INT NOT NULL,
     idTest INT NOT NULL,
     idUsuario INT,
-    Estado VARCHAR(50) NOT NULL, -- Ej: 'Pass', 'Fail', 'In Progress'
+    Estado VARCHAR(50) NOT NULL, 
+    FechaEjecucion DATE, -- Agregado
     PRIMARY KEY (idTestCycle, idTest),
     FOREIGN KEY (idTestCycle) REFERENCES Test_Cycle(idTestCycle) ON DELETE CASCADE,
     FOREIGN KEY (idTest) REFERENCES Tests(idTest) ON DELETE CASCADE,
