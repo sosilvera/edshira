@@ -13,4 +13,4 @@ COPY . .
 WORKDIR /edshira/src
 
 EXPOSE 30095
-CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "30095"]
+CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8080"]
