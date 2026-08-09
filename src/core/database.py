@@ -12,6 +12,11 @@ db_username = os.getenv("DB_USERNAME")
 db_password = os.getenv("DB_PASSWORD")
 db_name = os.getenv("DB_NAME")
 
+connect_args = {}
+if "aivencloud.com" in DATABASE_URL:
+    # Esta ruta de certificados viene por defecto en el contenedor de Python de Cloud Run
+    connect_args = {"ssl": {"ca": "/etc/ssl/certs/ca-certificates.crt"}}
+    
 SQLALCHEMY_DATABASE_URL = f"mysql+pymysql://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
