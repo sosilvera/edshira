@@ -1,10 +1,10 @@
 from schema.models import (Base, Usuario, TipoTarea, EstadoTarea, Proyecto, ProyectoSprint, TestPlan, TestCycle, Tarea, Test, TestExecution, DefectoTest, UsuarioProyecto)
 from sqlalchemy import create_engine, func, and_, or_, update
-from sqlalchemy.orm import sessionmaker, aliased
+from sqlalchemy.orm import sessionmaker, aliased, Session
 from datetime import datetime
 
 class Querys():
-    def __init__(self, db: SessionLocal):
+    def __init__(self, db: Session):
         self.session = db
 
     def getUserByName(self, nombreUsuario: str):

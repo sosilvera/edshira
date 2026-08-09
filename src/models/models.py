@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 # Modelos Pydantic para las solicitudes y respuestas
 class CreateSprintRequest(BaseModel):

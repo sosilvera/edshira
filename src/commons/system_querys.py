@@ -1,10 +1,10 @@
 from schema.models import (Base, Usuario)
 from sqlalchemy import create_engine, func, and_, or_, update, text
-from sqlalchemy.orm import sessionmaker, aliased
+from sqlalchemy.orm import sessionmaker, aliased, Session
 from datetime import datetime
 
 class Querys():
-    def __init__(self, db: SessionLocal):
+    def __init__(self, db: Session):
         self.session = db
 
     def getDBStatus(self):
