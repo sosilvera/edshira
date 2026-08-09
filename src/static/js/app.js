@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:30095/edshira/api/projects'; // Ajustar según entorno
+const API_URL = '/edshira/api/projects'; // Ajustar según entorno
 const MAP_TYPES = {
     "Bug": 1,
     "HU": 2

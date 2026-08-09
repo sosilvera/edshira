@@ -1,7 +1,7 @@
 // ==========================================
 // VARIABLES GLOBALES Y UTILIDADES
 // ==========================================
-const API_URL = 'http://localhost:30095/edshira/api'; 
+const API_URL = '/edshira/api'; 
 let currentTestCases = []; 
 let currentTestPlanId = null;
 
