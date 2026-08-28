@@ -25,8 +25,8 @@ class Querys():
 
     def getProyectos(self):
         try:
-            proyectos = self.session.query(Proyecto.idProyecto, Proyecto.Nombre).all()
-            return [{"idProyecto": p[0], "nombre": p[1]} for p in proyectos]
+            proyectos = self.session.query(Proyecto.idProyecto, Proyecto.Nombre, Proyecto.Codigo).all()
+            return [{"idProyecto": p[0], "nombre": p[1], "codigo": p[2]} for p in proyectos]
         except Exception as e:
             print(f"Error al obtener los proyectos: {str(e)}")
             return []
