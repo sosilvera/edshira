@@ -304,6 +304,14 @@ class Querys():
             print(f"Error al obtener los usuarios: {str(e)}")
             return None
 
+    def getCodigoProyecto(self, idProyecto: int):
+        try:
+            codigo = self.session.query(Proyecto.Codigo).filter(Proyecto.idProyecto == idProyecto).scalar()
+            return codigo
+        except Exception as e:
+            print(f"Error al obtener el código del proyecto: {str(e)}")
+            return None
+
     def createUsuario(self, nombre: str):
         try:
             idUser = self.getUserByName(nombre)
@@ -312,7 +320,7 @@ class Querys():
                 self.session.add(nuevo_usuario)
                 self.session.commit()
                 new_user = nuevo_usuario.idUsuario
-            
+
             if idUser is not None:
                 return {"idUsuario": idUser["id"]}
 
