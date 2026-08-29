@@ -73,6 +73,24 @@
         </div>
     </div>
 
+    <div id="change-project-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cambiar de Proyecto</h2>
+                <button class="close-modal" id="close-change-project-modal">✖</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-subtitle">Selecciona el proyecto al que deseas cambiar:</p>
+                <div class="form-group">
+                    <select id="change-project-select" class="modal-input">
+                        <option value="">Cargando proyectos...</option>
+                    </select>
+                </div>
+                <button id="btn-confirm-change-project" class="btn-primary w-100">Cambiar Proyecto</button>
+            </div>
+        </div>
+    </div>
+
     <div id="view-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content modal-stacked">
             
@@ -176,8 +194,20 @@
                 <div class="navbar-actions">
                     <button class="btn-create" id="btn-open-create">+ Crear historia</button>
                     <div class="user-profile">
-                        <div class="user-avatar" id="nav-avatar">?</div>
-                        <span class="user-name" id="nav-username">Cargando...</span>
+                        <button class="user-avatar-btn" id="user-avatar-btn">
+                            <div class="user-avatar" id="nav-avatar">?</div>
+                            <span class="user-name" id="nav-username">Cargando...</span>
+                        </button>
+                        <div class="user-dropdown" id="user-dropdown" style="display: none;">
+                            <button class="dropdown-item" id="btn-logout">
+                                <span class="dropdown-icon">🚪</span>
+                                <span>Desloguear</span>
+                            </button>
+                            <button class="dropdown-item" id="btn-change-project">
+                                <span class="dropdown-icon">📁</span>
+                                <span>Cambiar de Proyecto</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -195,31 +225,30 @@
                 <div class="kanban-column" data-status="todo">
                     <div class="column-header"><h3>To Do</h3></div>
                     <div class="kanban-cards">
-                        <div class="card bug-card" draggable="true" id="8">
-                            <div class="card-content">
-                                <h4 class="task-title">Crear bibite da error 2</h4>
-                                <p class="task-desc">Al cargar el archivo y ejecutar procesar...</p>
-                            </div>
-                            <div class="card-footer">
-                                <span class="task-code">BBM-5</span>
-                            </div>
-                        </div>
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
                     </div>
                 </div>
 
                 <div class="kanban-column" data-status="inprogress">
                     <div class="column-header"><h3>En Progreso</h3></div>
-                    <div class="kanban-cards"></div>
+                    <div class="kanban-cards">
+                        <div class="skeleton-card"></div>
+                    </div>
                 </div>
 
                 <div class="kanban-column" data-status="testing">
                     <div class="column-header"><h3>Testing</h3></div>
-                    <div class="kanban-cards"></div>
+                    <div class="kanban-cards">
+                        <div class="skeleton-card"></div>
+                    </div>
                 </div>
 
                 <div class="kanban-column" data-status="done">
                     <div class="column-header"><h3>Done</h3></div>
-                    <div class="kanban-cards"></div>
+                    <div class="kanban-cards">
+                        <div class="skeleton-card"></div>
+                    </div>
                 </div>
             </div>
         </main>

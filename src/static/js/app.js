@@ -20,10 +20,114 @@ document.addEventListener('DOMContentLoaded', () => {
     // UI Superior
     const navUsername = document.getElementById('nav-username');
     const navAvatar = document.getElementById('nav-avatar');
+    const userAvatarBtn = document.getElementById('user-avatar-btn');
+    const userDropdown = document.getElementById('user-dropdown');
+    const btnLogout = document.getElementById('btn-logout');
+    const btnChangeProject = document.getElementById('btn-change-project');
+    const changeProjectModal = document.getElementById('change-project-modal');
+    const closeChangeProjectModal = document.getElementById('close-change-project-modal');
+    const changeProjectSelect = document.getElementById('change-project-select');
+    const btnConfirmChangeProject = document.getElementById('btn-confirm-change-project');
 
     // Inicializar App
     runInitFlow();
     setupUI();
+    setupUserDropdown();
+
+    // ==========================================
+    // LÓGICA DEL DROPDOWN DE USUARIO
+    // ==========================================
+
+    function setupUserDropdown() {
+        userAvatarBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.style.display = userDropdown.style.display === 'none' ? 'block' : 'none';
+        });
+
+        btnLogout.addEventListener('click', () => {
+            localStorage.clear();
+            window.location.reload();
+        });
+
+        btnChangeProject.addEventListener('click', async () => {
+            userDropdown.style.display = 'none';
+            changeProjectModal.style.display = 'flex';
+            changeProjectSelect.innerHTML = '<option value="">Cargando proyectos...</option>';
+
+            try {
+                const res = await fetch(`${API_URL}/get_proyectos`);
+                const proyectos = await res.json();
+
+                if (proyectos && proyectos.length > 0) {
+                    changeProjectSelect.innerHTML = '<option value="">Selecciona un proyecto...</option>';
+                    proyectos.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p.idProyecto;
+                        opt.dataset.codigo = p.codigo;
+                        opt.textContent = p.nombre;
+                        changeProjectSelect.appendChild(opt);
+                    });
+                    btnConfirmChangeProject.disabled = false;
+                } else {
+                    changeProjectSelect.innerHTML = '<option value="">No hay proyectos disponibles</option>';
+                    btnConfirmChangeProject.disabled = true;
+                }
+            } catch (error) {
+                console.error("Error al cargar proyectos:", error);
+                changeProjectSelect.innerHTML = '<option value="">Error al cargar proyectos</option>';
+                btnConfirmChangeProject.disabled = true;
+            }
+        });
+
+        closeChangeProjectModal.addEventListener('click', () => {
+            changeProjectModal.style.display = 'none';
+            btnConfirmChangeProject.disabled = false;
+        });
+
+        btnConfirmChangeProject.addEventListener('click', async () => {
+            const selectedProjectId = changeProjectSelect.value;
+            const selectedOption = changeProjectSelect.options[changeProjectSelect.selectedIndex];
+            const userId = localStorage.getItem('userId');
+
+            if (!selectedProjectId) {
+                alert('Por favor, selecciona un proyecto.');
+                return;
+            }
+
+            try {
+                btnConfirmChangeProject.disabled = true;
+                btnConfirmChangeProject.textContent = 'Cambiando...';
+
+                // Llamar a /asignar_proyecto
+                await fetch(`${API_URL}/asignar_proyecto`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        idUsuario: parseInt(userId),
+                        idProyecto: parseInt(selectedProjectId)
+                    })
+                });
+
+                // Guardar en local storage y recargar
+                const selectedCode = selectedOption.dataset.codigo;
+                localStorage.setItem('projectId', selectedProjectId);
+                localStorage.setItem('projectCode', selectedCode);
+
+                window.location.reload();
+            } catch (error) {
+                console.error("Error al cambiar proyecto:", error);
+                alert("Error al cambiar el proyecto.");
+                btnConfirmChangeProject.disabled = false;
+                btnConfirmChangeProject.textContent = 'Cambiar Proyecto';
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!userDropdown.contains(e.target) && !userAvatarBtn.contains(e.target)) {
+                userDropdown.style.display = 'none';
+            }
+        });
+    }
 
     // ==========================================
     // LÓGICA DE INICIALIZACIÓN
@@ -197,8 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.ok) {
                 const sprintData = await res.json();
                 console.log("Sprint Activo cargado:", sprintData);
-                
-                // 1. Limpiamos todas las columnas por si recargamos la data
+
+                // 1. Limpiamos todas las columnas (incluyendo skeletons)
                 document.querySelectorAll('.kanban-cards').forEach(col => col.innerHTML = '');
 
                 // Opcional: Actualizar el título del Sprint en la UI
@@ -215,6 +319,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error("Error al cargar el sprint:", error);
+            // Limpiar skeletons en caso de error
+            document.querySelectorAll('.kanban-cards').forEach(col => col.innerHTML = '');
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'loading-text';
+            errorMsg.textContent = 'Error al cargar el sprint. Intenta recargar la página.';
+            document.querySelector('.kanban-board .kanban-column[data-status="todo"] .kanban-cards').appendChild(errorMsg);
         }
     }
 

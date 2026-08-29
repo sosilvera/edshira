@@ -1,7 +1,7 @@
 const API_URL = '/edshira/api/projects'; // Ajustar según tu entorno
 
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     // --- UI Compartida (Sidebar y Navbar) ---
     const sidebar = document.getElementById('sidebar');
     const toggleSidebarBtn = document.getElementById('toggle-sidebar');
@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const userName = localStorage.getItem('userName') || 'Usuario';
     document.getElementById('nav-username').textContent = userName;
     document.getElementById('nav-avatar').textContent = userName.charAt(0).toUpperCase();
+
+    // --- Setup del Dropdown de Usuario ---
+    setupUserDropdown();
 
     const projectId = localStorage.getItem('projectId');
     if (!projectId) {
@@ -139,4 +142,107 @@ function obtenerIniciales(nombreCompleto) {
     const partes = nombreCompleto.trim().split(' ');
     if (partes.length === 1) return partes[0].substring(0, 2).toUpperCase();
     return (partes[0][0] + partes[1][0]).toUpperCase();
+}
+
+// Función para configurar el dropdown del usuario
+function setupUserDropdown() {
+    const userAvatarBtn = document.getElementById('user-avatar-btn');
+    const userDropdown = document.getElementById('user-dropdown');
+    const btnLogout = document.getElementById('btn-logout');
+    const btnChangeProject = document.getElementById('btn-change-project');
+    const changeProjectModal = document.getElementById('change-project-modal');
+    const closeChangeProjectModal = document.getElementById('close-change-project-modal');
+    const changeProjectSelect = document.getElementById('change-project-select');
+    const btnConfirmChangeProject = document.getElementById('btn-confirm-change-project');
+
+    if (!userAvatarBtn || !userDropdown) return;
+
+    userAvatarBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userDropdown.style.display = userDropdown.style.display === 'none' ? 'block' : 'none';
+    });
+
+    btnLogout.addEventListener('click', () => {
+        localStorage.clear();
+        window.location.reload();
+    });
+
+    btnChangeProject.addEventListener('click', async () => {
+        userDropdown.style.display = 'none';
+        changeProjectModal.style.display = 'flex';
+        changeProjectSelect.innerHTML = '<option value="">Cargando proyectos...</option>';
+
+        try {
+            const res = await fetch(`${API_URL}/get_proyectos`);
+            const proyectos = await res.json();
+
+            if (proyectos && proyectos.length > 0) {
+                changeProjectSelect.innerHTML = '<option value="">Selecciona un proyecto...</option>';
+                proyectos.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.idProyecto;
+                    opt.dataset.codigo = p.codigo;
+                    opt.textContent = p.nombre;
+                    changeProjectSelect.appendChild(opt);
+                });
+                btnConfirmChangeProject.disabled = false;
+            } else {
+                changeProjectSelect.innerHTML = '<option value="">No hay proyectos disponibles</option>';
+                btnConfirmChangeProject.disabled = true;
+            }
+        } catch (error) {
+            console.error("Error al cargar proyectos:", error);
+            changeProjectSelect.innerHTML = '<option value="">Error al cargar proyectos</option>';
+            btnConfirmChangeProject.disabled = true;
+        }
+    });
+
+    closeChangeProjectModal.addEventListener('click', () => {
+        changeProjectModal.style.display = 'none';
+        btnConfirmChangeProject.disabled = false;
+    });
+
+    btnConfirmChangeProject.addEventListener('click', async () => {
+        const selectedProjectId = changeProjectSelect.value;
+        const selectedOption = changeProjectSelect.options[changeProjectSelect.selectedIndex];
+        const userId = localStorage.getItem('userId');
+
+        if (!selectedProjectId) {
+            alert('Por favor, selecciona un proyecto.');
+            return;
+        }
+
+        try {
+            btnConfirmChangeProject.disabled = true;
+            btnConfirmChangeProject.textContent = 'Cambiando...';
+
+            // Llamar a /asignar_proyecto
+            await fetch(`${API_URL}/asignar_proyecto`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    idUsuario: parseInt(userId),
+                    idProyecto: parseInt(selectedProjectId)
+                })
+            });
+
+            // Guardar en local storage y recargar
+            const selectedCode = selectedOption.dataset.codigo;
+            localStorage.setItem('projectId', selectedProjectId);
+            localStorage.setItem('projectCode', selectedCode);
+
+            window.location.reload();
+        } catch (error) {
+            console.error("Error al cambiar proyecto:", error);
+            alert("Error al cambiar el proyecto.");
+            btnConfirmChangeProject.disabled = false;
+            btnConfirmChangeProject.textContent = 'Cambiar Proyecto';
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!userDropdown.contains(e.target) && !userAvatarBtn.contains(e.target)) {
+            userDropdown.style.display = 'none';
+        }
+    });
 }
